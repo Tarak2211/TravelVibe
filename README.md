@@ -30,7 +30,6 @@ TravelVibe/
 ```
 
 ---
----
 
 ## 📸 Screenshots
 
@@ -67,7 +66,6 @@ TravelVibe/
 ![Admin Dashboard](./static/AdminDashboard.png)
 
 ---
-
 
 ## Features Implemented
 
