@@ -1,0 +1,466 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+{% block title %}Admin Dashboard — TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: #f1f5f9 !important; margin: 0; font-family: 'Inter','Segoe UI',sans-serif; }
+
+  /* ── Layout ── */
+  .adm-wrap { display: flex; min-height: calc(100vh - 60px); }
+
+  /* ── Sidebar ── */
+  .adm-sidebar {
+    width: 220px; flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid #e2e8f0;
+    padding: 24px 0;
+    display: flex; flex-direction: column; gap: 2px;
+    box-shadow: 2px 0 8px rgba(0,0,0,.04);
+  }
+  .sidebar-section {
+    font-size: .65rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .1em; color: #94a3b8;
+    padding: 14px 20px 5px;
+  }
+  .sidebar-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 20px; color: #64748b;
+    text-decoration: none; font-size: .84rem; font-weight: 500;
+    border-left: 3px solid transparent;
+    transition: all .15s;
+  }
+  .sidebar-link:hover { color: #0ea5e9; background: #f0f9ff; }
+  .sidebar-link.active { color: #0ea5e9; background: #f0f9ff; border-left-color: #0ea5e9; font-weight: 700; }
+  .sidebar-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ── Main ── */
+  .adm-main { flex: 1; overflow-x: hidden; padding: 28px 28px 60px; }
+
+  /* ── Hero ── */
+  .adm-hero {
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    border-radius: 18px; padding: 26px 30px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; position: relative; overflow: hidden;
+  }
+  .adm-hero::before { content:''; position:absolute; right:-40px; top:-40px; width:200px; height:200px; border-radius:50%; background:rgba(255,255,255,.08); }
+  .adm-hero::after  { content:''; position:absolute; right:60px; bottom:-60px; width:150px; height:150px; border-radius:50%; background:rgba(255,255,255,.05); }
+  .hero-text h1 { font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0 0 5px; }
+  .hero-text p  { font-size: .86rem; color: rgba(255,255,255,.78); margin: 0; }
+  .hero-badge {
+    background: rgba(255,255,255,.18); backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,.25);
+    border-radius: 12px; padding: 12px 20px; text-align: center; color: #fff; z-index: 1;
+  }
+  .hero-badge .hb-val { font-size: 1.5rem; font-weight: 800; }
+  .hero-badge .hb-lbl { font-size: .7rem; opacity: .85; margin-top: 2px; }
+
+  /* ── KPI grid ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 22px; }
+  .kpi {
+    background: #fff; border-radius: 14px; padding: 18px 20px;
+    border: 1px solid #e2e8f0; box-shadow: 0 1px 6px rgba(0,0,0,.05);
+    display: flex; flex-direction: column; gap: 8px;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .kpi:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.09); }
+  .kpi-top { display: flex; align-items: center; justify-content: space-between; }
+  .kpi-lbl { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #94a3b8; }
+  .kpi-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .kpi-icon.blue   { background: #e0f2fe; }
+  .kpi-icon.green  { background: #d1fae5; }
+  .kpi-icon.amber  { background: #fef3c7; }
+  .kpi-icon.purple { background: #ede9fe; }
+  .kpi-icon.rose   { background: #ffe4e6; }
+  .kpi-icon.teal   { background: #ccfbf1; }
+  .kpi-val { font-size: 1.55rem; font-weight: 800; color: #0f172a; line-height: 1; }
+  .kpi-val.blue   { color: #0ea5e9; }
+  .kpi-val.green  { color: #10b981; }
+  .kpi-val.amber  { color: #f59e0b; }
+  .kpi-val.purple { color: #8b5cf6; }
+  .kpi-val.teal   { color: #14b8a6; }
+  .kpi-sub { font-size: .72rem; color: #94a3b8; }
+
+  /* ── Grid rows ── */
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* ── Panel ── */
+  .panel { background: #fff; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 6px rgba(0,0,0,.05); overflow: hidden; }
+  .panel-head {
+    padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-head h2 { font-size: .88rem; font-weight: 800; color: #1e293b; margin: 0; }
+  .panel-head a  { font-size: .78rem; color: #0ea5e9; text-decoration: none; font-weight: 600; }
+  .panel-head a:hover { color: #0284c7; }
+  .panel-body { padding: 16px 18px; }
+
+  /* ── Status tiles ── */
+  .status-tiles { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .st { border-radius: 12px; padding: 14px; text-align: center; }
+  .st .sv { font-size: 1.5rem; font-weight: 800; }
+  .st .sl { font-size: .7rem; font-weight: 700; margin-top: 3px; text-transform: uppercase; letter-spacing: .05em; }
+  .st-confirmed { background: #d1fae5; color: #065f46; }
+  .st-pending   { background: #fef3c7; color: #92400e; }
+  .st-completed { background: #dbeafe; color: #1e40af; }
+  .st-cancelled { background: #fee2e2; color: #991b1b; }
+
+  /* ── Revenue bars ── */
+  .rev-rows { display: flex; flex-direction: column; gap: 14px; }
+  .rev-item .ri-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .rev-item .ri-lbl  { font-size: .78rem; font-weight: 600; color: #64748b; }
+  .rev-item .ri-val  { font-size: .78rem; font-weight: 700; color: #1e293b; }
+  .rev-track { background: #f1f5f9; border-radius: 99px; height: 8px; overflow: hidden; }
+  .rev-fill  { height: 8px; border-radius: 99px; }
+
+  /* ── Recent bookings ── */
+  .rb-list { display: flex; flex-direction: column; }
+  .rb-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+  .rb-item:last-child { border-bottom: none; }
+  .rb-av {
+    width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg,#0ea5e9,#6366f1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .82rem; font-weight: 800; color: #fff;
+  }
+  .rb-info { flex: 1; min-width: 0; }
+  .rb-name { font-size: .82rem; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rb-pkg  { font-size: .72rem; color: #94a3b8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rb-right { text-align: right; flex-shrink: 0; }
+  .rb-amt  { font-size: .82rem; font-weight: 700; color: #10b981; }
+  .rb-date { font-size: .7rem; color: #94a3b8; }
+
+  /* ── Destinations ── */
+  .dest-rows { display: flex; flex-direction: column; gap: 12px; }
+  .dest-row .dr-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+  .dest-row .dr-name { font-size: .82rem; font-weight: 700; color: #1e293b; }
+  .dest-row .dr-cnt  { font-size: .78rem; font-weight: 700; color: #0ea5e9; }
+  .dest-track { background: #f1f5f9; border-radius: 99px; height: 6px; overflow: hidden; }
+  .dest-fill  { height: 6px; border-radius: 99px; background: linear-gradient(90deg,#0ea5e9,#6366f1); }
+
+  /* ── Users table ── */
+  .u-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+  .u-table thead th {
+    background: #f8fafc; color: #64748b; padding: 11px 14px;
+    text-align: left; font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .07em;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  .u-table tbody td { padding: 11px 14px; border-bottom: 1px solid #f1f5f9; color: #475569; vertical-align: middle; }
+  .u-table tbody tr:last-child td { border-bottom: none; }
+  .u-table tbody tr:hover td { background: #f8fafc; }
+  .u-table .u-name { font-weight: 700; color: #1e293b; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .68rem; font-weight: 700; }
+  .b-admin { background: #fef3c7; color: #92400e; }
+  .b-user  { background: #d1fae5; color: #065f46; }
+
+  @media (max-width: 900px) {
+    .adm-sidebar { display: none; }
+    .row2, .row3 { grid-template-columns: 1fr; }
+    .status-tiles { grid-template-columns: repeat(2,1fr); }
+    .kpi-grid { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="adm-wrap">
+
+  <!-- Sidebar -->
+  <aside class="adm-sidebar">
+    <div class="sidebar-section">Overview</div>
+    <a href="{% url 'accounts_report' %}" class="sidebar-link active">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a href="{% url 'booking_report' %}" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6M5 8h14M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+      Booking Report
+    </a>
+
+    <div class="sidebar-section">Users</div>
+    <a href="#users-section" class="sidebar-link" onclick="document.getElementById('users-section').scrollIntoView({behavior:'smooth'});return false;">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      All Users
+    </a>
+
+    <div class="sidebar-section">Quick Links</div>
+    <a href="{% url 'profile' %}" class="sidebar-link">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      My Profile
+    </a>
+    <a href="{% url 'logout' %}" class="sidebar-link" style="margin-top:auto;">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+      Logout
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <main class="adm-main">
+
+    <!-- Hero -->
+    <div class="adm-hero">
+      <div class="hero-text">
+        <h1>Welcome back, {{ request.user.get_full_name|default:request.user.username }} 👋</h1>
+        <p>Here's what's happening on TravelVibe right now.</p>
+      </div>
+      <div style="display:flex;gap:12px;z-index:1;">
+        <div class="hero-badge">
+          <div class="hb-val">{{ new_bookings_7d }}</div>
+          <div class="hb-lbl">New this week</div>
+        </div>
+        <div class="hero-badge">
+          <div class="hb-val">{{ new_users_30d }}</div>
+          <div class="hb-lbl">New users / 30d</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Total Bookings</div><div class="kpi-icon blue">✈️</div></div>
+        <div class="kpi-val blue">{{ total_bookings }}</div>
+        <div class="kpi-sub">+{{ new_bookings_7d }} this week</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Total Revenue</div><div class="kpi-icon green">💰</div></div>
+        <div class="kpi-val green">₹{{ total_revenue|floatformat:0|intcomma }}</div>
+        <div class="kpi-sub">Collected ₹{{ total_collected|floatformat:0|intcomma }}</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Pending Amount</div><div class="kpi-icon amber">⏳</div></div>
+        <div class="kpi-val amber">₹{{ total_pending|floatformat:0|intcomma }}</div>
+        <div class="kpi-sub">Across all bookings</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Registered Users</div><div class="kpi-icon purple">👥</div></div>
+        <div class="kpi-val purple">{{ users_count }}</div>
+        <div class="kpi-sub">+{{ new_users_30d }} last 30 days</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Packages</div><div class="kpi-icon teal">🗺️</div></div>
+        <div class="kpi-val teal">{{ total_packages }}</div>
+        <div class="kpi-sub">{{ total_destinations }} destinations</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-top"><div class="kpi-lbl">Confirmed</div><div class="kpi-icon rose">✅</div></div>
+        <div class="kpi-val green">{{ confirmed_count }}</div>
+        <div class="kpi-sub">{{ pending_count }} still pending</div>
+      </div>
+    </div>
+
+    <!-- Status tiles + Revenue -->
+    <div class="row2">
+      <div class="panel">
+        <div class="panel-head"><h2>Booking Status</h2></div>
+        <div class="panel-body">
+          <div class="status-tiles">
+            <div class="st st-confirmed"><div class="sv">{{ confirmed_count }}</div><div class="sl">Confirmed</div></div>
+            <div class="st st-pending">  <div class="sv">{{ pending_count }}</div>  <div class="sl">Pending</div></div>
+            <div class="st st-completed"><div class="sv">{{ completed_count }}</div><div class="sl">Completed</div></div>
+            <div class="st st-cancelled"><div class="sv">{{ cancelled_count }}</div><div class="sl">Cancelled</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Revenue Breakdown</h2></div>
+        <div class="panel-body">
+          <div class="rev-rows">
+            <div class="rev-item">
+              <div class="ri-head">
+                <span class="ri-lbl">Collected</span>
+                <span class="ri-val">₹{{ total_collected|floatformat:0|intcomma }}</span>
+              </div>
+              <div class="rev-track">
+                {% if total_revenue > 0 %}
+                <div class="rev-fill" style="width:{% widthratio total_collected total_revenue 100 %}%;background:linear-gradient(90deg,#10b981,#34d399);"></div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="rev-item">
+              <div class="ri-head">
+                <span class="ri-lbl">Pending</span>
+                <span class="ri-val">₹{{ total_pending|floatformat:0|intcomma }}</span>
+              </div>
+              <div class="rev-track">
+                {% if total_revenue > 0 %}
+                <div class="rev-fill" style="width:{% widthratio total_pending total_revenue 100 %}%;background:linear-gradient(90deg,#f59e0b,#fbbf24);"></div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="rev-item">
+              <div class="ri-head">
+                <span class="ri-lbl">Total</span>
+                <span class="ri-val">₹{{ total_revenue|floatformat:0|intcomma }}</span>
+              </div>
+              <div class="rev-track">
+                <div class="rev-fill" style="width:100%;background:linear-gradient(90deg,#0ea5e9,#6366f1);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings + Top Destinations -->
+    <div class="row3">
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Recent Bookings</h2>
+          <a href="{% url 'booking_report' %}">View all →</a>
+        </div>
+        <div class="panel-body">
+          <div class="rb-list">
+            {% for b in recent_bookings %}
+            <div class="rb-item">
+              <div class="rb-av">{{ b.user.get_full_name|default:b.user.username|slice:":1"|upper }}</div>
+              <div class="rb-info">
+                <div class="rb-name">{{ b.user.get_full_name|default:b.user.username }}</div>
+                <div class="rb-pkg">{{ b.package.title }} · {{ b.package.destination.name }}</div>
+              </div>
+              <div class="rb-right">
+                <div class="rb-amt">₹{{ b.total_amount|floatformat:0|intcomma }}</div>
+                <div class="rb-date">{{ b.created_at|date:"d M" }}</div>
+              </div>
+            </div>
+            {% empty %}
+            <p style="color:#475569;font-size:.85rem;text-align:center;padding:24px 0;">No bookings yet.</p>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>Top Destinations</h2></div>
+        <div class="panel-body">
+          <div class="dest-rows">
+            {% with max_count=top_destinations.0.count|default:1 %}
+            {% for d in top_destinations %}
+            <div class="dest-row">
+              <div class="dr-head">
+                <span class="dr-name">{{ d.package__destination__name }}</span>
+                <span class="dr-cnt">{{ d.count }} bookings</span>
+              </div>
+              <div class="dest-track">
+                <div class="dest-fill" style="width:{% widthratio d.count max_count 100 %}%;"></div>
+              </div>
+            </div>
+            {% empty %}
+            <p style="color:#475569;font-size:.85rem;text-align:center;padding:24px 0;">No data yet.</p>
+            {% endfor %}
+            {% endwith %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="panel" id="users-section">
+      <div class="panel-head">
+        <h2>All Registered Users</h2>
+        <span style="font-size:.78rem;color:#475569;">{{ total_accounts }} total</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="u-table" id="usersTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Role</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in accounts %}
+            <tr>
+              <td style="color:#334155;">{{ forloop.counter }}</td>
+              <td class="u-name">{{ u.get_full_name|default:u.username }}</td>
+              <td>{{ u.email }}</td>
+              <td>{{ u.phone_number|default:"—" }}</td>
+              <td>
+                {% if u.is_staff %}<span class="badge b-admin">Admin</span>
+                {% else %}<span class="badge b-user">User</span>{% endif %}
+              </td>
+              <td style="white-space:nowrap;">{{ u.date_joined|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <!-- Pagination controls -->
+      <div id="usersPagination" style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #f1f5f9;flex-wrap:wrap;gap:8px;">
+        <span id="pageInfo" style="font-size:.78rem;color:#64748b;"></span>
+        <div style="display:flex;gap:6px;" id="pageButtons"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+(function() {
+  const ROWS_PER_PAGE = 10;
+  const tbody = document.querySelector('#usersTable tbody');
+  const rows  = Array.from(tbody.querySelectorAll('tr'));
+  const total = rows.length;
+  let current = 1;
+
+  function totalPages() { return Math.ceil(total / ROWS_PER_PAGE); }
+
+  function render() {
+    const start = (current - 1) * ROWS_PER_PAGE;
+    const end   = start + ROWS_PER_PAGE;
+    rows.forEach((r, i) => r.style.display = (i >= start && i < end) ? '' : 'none');
+
+    // Info text
+    document.getElementById('pageInfo').textContent =
+      'Showing ' + (start + 1) + '–' + Math.min(end, total) + ' of ' + total + ' users';
+
+    // Buttons
+    const container = document.getElementById('pageButtons');
+    container.innerHTML = '';
+    const tp = totalPages();
+
+    const btn = (label, page, disabled, active) => {
+      const b = document.createElement('button');
+      b.textContent = label;
+      b.disabled = disabled;
+      b.style.cssText = [
+        'padding:5px 11px', 'border-radius:7px', 'font-size:.78rem', 'font-weight:600',
+        'cursor:' + (disabled ? 'default' : 'pointer'),
+        'border:1px solid ' + (active ? '#0ea5e9' : '#e2e8f0'),
+        'background:' + (active ? '#0ea5e9' : '#fff'),
+        'color:' + (active ? '#fff' : (disabled ? '#cbd5e1' : '#475569')),
+        'transition:all .15s'
+      ].join(';');
+      if (!disabled && !active) b.onmouseover = () => { b.style.borderColor='#0ea5e9'; b.style.color='#0ea5e9'; };
+      if (!disabled && !active) b.onmouseout  = () => { b.style.borderColor='#e2e8f0'; b.style.color='#475569'; };
+      b.onclick = () => { if (!disabled) { current = page; render(); } };
+      return b;
+    };
+
+    container.appendChild(btn('← Prev', current - 1, current === 1, false));
+    for (let p = 1; p <= tp; p++) {
+      if (tp <= 7 || p === 1 || p === tp || Math.abs(p - current) <= 1) {
+        container.appendChild(btn(p, p, false, p === current));
+      } else if (Math.abs(p - current) === 2) {
+        const dots = document.createElement('span');
+        dots.textContent = '…';
+        dots.style.cssText = 'padding:5px 4px;color:#94a3b8;font-size:.78rem;';
+        container.appendChild(dots);
+      }
+    }
+    container.appendChild(btn('Next →', current + 1, current === tp, false));
+  }
+
+  if (total > ROWS_PER_PAGE) render();
+  else document.getElementById('usersPagination').style.display = 'none';
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,371 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Tour Packages - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+* { margin:0; padding:0; box-sizing:border-box; ::-webkit-scrollbar {
+  display: none;
+}}
+
+.hero-banner {
+    position:relative; height:260px;
+    background:linear-gradient(rgba(0,0,0,0.48),rgba(0,0,0,0.48)),
+               url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=90') center/cover fixed;
+    display:flex; align-items:center; justify-content:center; color:#fff; text-align:center;
+}
+.hero-banner h1 { font-size:2.4rem; font-weight:900; letter-spacing:-1px; margin-bottom:0.4rem; }
+.hero-banner p  { font-size:1rem; opacity:.9; }
+
+.page-body {
+    background:linear-gradient(180deg,#f0f9ff 0%,#fff 60%);
+    min-height:100vh; padding:2rem 1.5rem;
+}
+.page-layout {
+    max-width:1400px; margin:0 auto;
+    display:grid; grid-template-columns:280px 1fr; gap:1.8rem; align-items:start;
+}
+
+/* ── SIDEBAR ── */
+.filter-sidebar {
+    background:#fff; border-radius:16px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.08);
+    padding:1.4rem; position:sticky; top:80px;
+    border-top:4px solid #0ea5e9;
+    max-height:calc(100vh - 100px);
+    overflow-y:auto;
+}
+.sidebar-title {
+    font-size:1.05rem; font-weight:800; color:#0f172a;
+    display:flex; align-items:center; gap:0.5rem; margin-bottom:1.2rem;
+}
+.filter-block { margin-bottom:1.4rem; }
+.filter-block-label {
+    font-size:0.72rem; font-weight:800; color:#0ea5e9;
+    text-transform:uppercase; letter-spacing:1.2px; margin-bottom:0.7rem;
+    display:block;
+}
+
+/* Pill chips */
+.chip-group { display:flex; flex-wrap:wrap; gap:0.4rem; }
+.chip {
+    padding:0.38rem 0.85rem; border-radius:20px; font-size:0.78rem; font-weight:600;
+    border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569;
+    cursor:pointer; transition:all 0.2s; white-space:nowrap;
+    text-decoration:none; display:inline-block;
+}
+.chip:hover, .chip.active {
+    background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    color:#fff; border-color:transparent;
+    box-shadow:0 3px 10px rgba(14,165,233,0.3);
+}
+
+/* Text input */
+.filter-input {
+    width:100%; padding:0.6rem 0.85rem; border:1.5px solid #e2e8f0;
+    border-radius:10px; font-size:0.88rem; background:#f8fafc;
+    transition:all 0.2s; font-family:inherit;
+}
+.filter-input:focus { outline:none; border-color:#0ea5e9; background:#fff; box-shadow:0 0 0 3px rgba(14,165,233,0.12); }
+
+/* Price range */
+.price-row { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; }
+.price-row input { padding:0.55rem 0.7rem; border:1.5px solid #e2e8f0; border-radius:8px; font-size:0.82rem; background:#f8fafc; font-family:inherit; }
+.price-row input:focus { outline:none; border-color:#0ea5e9; }
+
+/* Buttons */
+.apply-btn {
+    width:100%; padding:0.75rem; background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    color:#fff; border:none; border-radius:10px; font-weight:800; font-size:0.9rem;
+    cursor:pointer; transition:all 0.2s; margin-top:0.4rem;
+    box-shadow:0 4px 14px rgba(14,165,233,0.35);
+}
+.apply-btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(14,165,233,0.45); }
+.clear-btn {
+    width:100%; padding:0.6rem; background:#fff; color:#64748b;
+    border:1.5px solid #e2e8f0; border-radius:10px; font-weight:700;
+    font-size:0.82rem; cursor:pointer; margin-top:0.5rem; transition:all 0.2s;
+}
+.clear-btn:hover { border-color:#0ea5e9; color:#0ea5e9; }
+
+/* ── RESULTS AREA ── */
+.results-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:1.2rem; flex-wrap:wrap; gap:0.5rem;
+}
+.results-count { font-size:0.9rem; color:#64748b; font-weight:600; }
+.results-count strong { color:#0ea5e9; }
+
+.sort-select {
+    padding:0.5rem 1rem; border:1.5px solid #e2e8f0; border-radius:10px;
+    font-size:0.85rem; background:#fff; font-family:inherit; cursor:pointer;
+}
+.sort-select:focus { outline:none; border-color:#0ea5e9; }
+
+/* ── PACKAGE CARDS ── */
+.packages-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:1.1rem;
+}
+.package-card {
+    background:#fff; border-radius:14px; overflow:hidden;
+    box-shadow:0 4px 20px rgba(0,0,0,0.07); border:1px solid #f1f5f9;
+    display:flex; flex-direction:column; transition:all 0.3s;
+}
+.package-card:hover { transform:translateY(-5px); box-shadow:0 12px 36px rgba(14,165,233,0.18); }
+.pkg-img-wrap { position:relative; height:150px; overflow:hidden; flex-shrink:0; }
+.pkg-img-wrap img { width:100%; height:100%; object-fit:cover; transition:transform 0.5s; }
+.package-card:hover .pkg-img-wrap img { transform:scale(1.08); }
+.pkg-badge {
+    position:absolute; top:0.7rem; right:0.7rem;
+    background:rgba(255,255,255,0.95); backdrop-filter:blur(8px);
+    padding:0.3rem 0.8rem; border-radius:20px; font-size:0.68rem;
+    font-weight:800; color:#0ea5e9; text-transform:uppercase; letter-spacing:0.5px;
+}
+.pkg-duration {
+    position:absolute; bottom:0.7rem; left:0.7rem;
+    background:rgba(0,0,0,0.65); color:#fff; padding:0.3rem 0.75rem;
+    border-radius:16px; font-size:0.75rem; font-weight:600;
+}
+.pkg-body { padding:1rem; display:flex; flex-direction:column; flex:1; }
+.pkg-title { font-size:1rem; font-weight:800; color:#0f172a; margin-bottom:0.3rem; line-height:1.3; }
+.pkg-loc { color:#0ea5e9; font-size:0.82rem; font-weight:700; margin-bottom:0.6rem; }
+.pkg-desc { color:#64748b; font-size:0.8rem; line-height:1.6; margin-bottom:0.8rem;
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.pkg-includes {
+    background:linear-gradient(135deg,#f0f9ff,#e0e7ff); border-radius:8px;
+    padding:0.7rem 0.8rem; margin-bottom:0.8rem;
+}
+.pkg-inc-item { font-size:0.75rem; color:#475569; padding:0.2rem 0; display:flex; align-items:center; gap:0.4rem; }
+.pkg-inc-item::before { content:'✓'; color:#10b981; font-weight:800; }
+.pkg-pricing { border-top:1.5px solid #f1f5f9; padding-top:0.8rem; margin-top:auto; }
+.pkg-price { font-size:1.25rem; font-weight:900; background:linear-gradient(135deg,#0ea5e9,#6366f1); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.pkg-price-label { font-size:0.72rem; color:#94a3b8; }
+.pkg-emi { font-size:0.72rem; color:#10b981; font-weight:700; margin-top:0.2rem; }
+.pkg-actions { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-top:0.8rem; }
+.btn-detail {
+    padding:0.55rem; background:linear-gradient(135deg,#0ea5e9,#6366f1);
+    color:#fff; text-align:center; border-radius:8px; font-size:0.72rem;
+    font-weight:800; text-decoration:none; text-transform:uppercase; letter-spacing:0.5px;
+    transition:all 0.2s;
+}
+.btn-detail:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(14,165,233,0.4); }
+.btn-book {
+    padding:0.55rem; background:#fff; color:#0ea5e9; text-align:center;
+    border-radius:8px; font-size:0.72rem; font-weight:800; text-decoration:none;
+    border:1.5px solid #0ea5e9; text-transform:uppercase; letter-spacing:0.5px; transition:all 0.2s;
+}
+.btn-book:hover { background:#0ea5e9; color:#fff; }
+
+.no-results { grid-column:1/-1; text-align:center; padding:4rem 2rem; color:#64748b; }
+
+@media(max-width:900px) {
+    .page-layout { grid-template-columns:1fr; }
+    .filter-sidebar { position:static; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="hero-banner">
+    <div>
+        <h1>✈️ Discover Your Next Adventure</h1>
+        <p>Handpicked tours with complete details &amp; transparent pricing</p>
+    </div>
+</section>
+
+<div class="page-body">
+<div class="page-layout">
+
+<!-- ── SIDEBAR FILTERS ── -->
+<aside class="filter-sidebar">
+    <div class="sidebar-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filters
+    </div>
+    <form method="GET" id="filterForm">
+
+        <!-- Search -->
+        <div class="filter-block">
+            <span class="filter-block-label">Search Destination</span>
+            <input type="text" name="destination" class="filter-input" placeholder="e.g. Goa, Dubai, Bali…" value="{{ search_destination }}">
+        </div>
+
+        <!-- Trip Type -->
+        <div class="filter-block">
+            <span class="filter-block-label">Trip Type</span>
+            <div class="chip-group">
+                <a href="#" class="chip {% if not search_trip_type %}active{% endif %}" onclick="setChip('trip_type','',this)">All</a>
+                <a href="#" class="chip {% if search_trip_type == 'domestic' %}active{% endif %}" onclick="setChip('trip_type','domestic',this)">🇮🇳 Domestic</a>
+                <a href="#" class="chip {% if search_trip_type == 'international' %}active{% endif %}" onclick="setChip('trip_type','international',this)">🌍 International</a>
+            </div>
+            <input type="hidden" name="trip_type" id="trip_type" value="{{ search_trip_type }}">
+        </div>
+
+        <!-- Category -->
+        <div class="filter-block">
+            <span class="filter-block-label">Category</span>
+            <div class="chip-group">
+                <a href="#" class="chip {% if not search_category %}active{% endif %}" onclick="setChip('category','',this)">All</a>
+                <a href="#" class="chip {% if search_category == 'honeymoon' %}active{% endif %}" onclick="setChip('category','honeymoon',this)">💑 Honeymoon</a>
+                <a href="#" class="chip {% if search_category == 'adventure' %}active{% endif %}" onclick="setChip('category','adventure',this)">🧗 Adventure</a>
+                <a href="#" class="chip {% if search_category == 'family' %}active{% endif %}" onclick="setChip('category','family',this)">👨‍👩‍👧 Family</a>
+                <a href="#" class="chip {% if search_category == 'solo' %}active{% endif %}" onclick="setChip('category','solo',this)">🎒 Solo</a>
+                <a href="#" class="chip {% if search_category == 'religious' %}active{% endif %}" onclick="setChip('category','religious',this)">🙏 Religious</a>
+            </div>
+            <input type="hidden" name="category" id="category" value="{{ search_category }}">
+        </div>
+
+        <!-- Duration -->
+        <div class="filter-block">
+            <span class="filter-block-label">Duration</span>
+            <div class="chip-group">
+                <a href="#" class="chip {% if not search_duration %}active{% endif %}" onclick="setChip('duration','',this)">Any</a>
+                <a href="#" class="chip {% if search_duration == '1-3' %}active{% endif %}" onclick="setChip('duration','1-3',this)">1–3 Days</a>
+                <a href="#" class="chip {% if search_duration == '4-7' %}active{% endif %}" onclick="setChip('duration','4-7',this)">4–7 Days</a>
+                <a href="#" class="chip {% if search_duration == '8-14' %}active{% endif %}" onclick="setChip('duration','8-14',this)">8–14 Days</a>
+                <a href="#" class="chip {% if search_duration == '15+' %}active{% endif %}" onclick="setChip('duration','15+',this)">15+ Days</a>
+            </div>
+            <input type="hidden" name="duration" id="duration" value="{{ search_duration }}">
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-block">
+            <span class="filter-block-label">Budget (₹ per person)</span>
+            <div class="price-row">
+                <input type="number" name="price_min" class="filter-input" placeholder="Min" value="{{ search_price_min }}" min="0">
+                <input type="number" name="price_max" class="filter-input" placeholder="Max" value="{{ search_price_max }}" min="0">
+            </div>
+            <!-- Quick budget chips -->
+            <div class="chip-group" style="margin-top:0.5rem;">
+                <a href="#" class="chip" onclick="setBudget(0,15000,this)">Under ₹15k</a>
+                <a href="#" class="chip" onclick="setBudget(15000,40000,this)">₹15k–40k</a>
+                <a href="#" class="chip" onclick="setBudget(40000,80000,this)">₹40k–80k</a>
+                <a href="#" class="chip" onclick="setBudget(80000,999999,this)">₹80k+</a>
+            </div>
+        </div>
+
+        <button type="submit" class="apply-btn">Apply Filters</button>
+        <a href="{% url 'packages' %}" class="clear-btn" style="display:block;text-align:center;text-decoration:none;padding:0.6rem;border:1.5px solid #e2e8f0;border-radius:10px;color:#64748b;font-weight:700;font-size:0.82rem;margin-top:0.5rem;">Clear All</a>
+    </form>
+</aside>
+
+<!-- ── RESULTS ── -->
+<div>
+    <div class="results-header">
+        <span class="results-count"><strong>{{ total_count }}</strong> package{{ total_count|pluralize }} found</span>
+        <select class="sort-select" onchange="applySort(this.value)">
+            <option value="" {% if not search_sort %}selected{% endif %}>Sort: Default</option>
+            <option value="popular" {% if search_sort == 'popular' %}selected{% endif %}>Most Popular</option>
+            <option value="price_low" {% if search_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if search_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="duration_short" {% if search_sort == 'duration_short' %}selected{% endif %}>Duration: Shortest</option>
+        </select>
+    </div>
+
+    <div class="packages-grid">
+        {% for package in packages %}
+        <div class="package-card">
+            <div class="pkg-img-wrap">
+                {% if package.image %}
+                <img src="{{ package.image.url }}" alt="{{ package.title }}">
+                {% else %}
+                {% with d=package.destination.name %}
+                {% if d == "Goa" %}<img src="https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Maldives" %}<img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Dubai" %}<img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Manali" %}<img src="https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Bali" %}<img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Paris" %}<img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Thailand" %}<img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Switzerland" %}<img src="https://images.unsplash.com/photo-1527668752968-14dc70a27c95?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Singapore" %}<img src="https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Kerala" %}<img src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Jaipur" %}<img src="https://images.unsplash.com/photo-1477587458883-47145ed94245?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Shimla" %}<img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Udaipur" %}<img src="https://images.unsplash.com/photo-1587474260584-136574528ed5?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Rishikesh" %}<img src="https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Andaman" %}<img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Leh Ladakh" %}<img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Agra" %}<img src="https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Darjeeling" %}<img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Coorg" %}<img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Ooty" %}<img src="https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Mysore" %}<img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Varanasi" %}<img src="https://images.unsplash.com/photo-1561361058-c24cecae35ca?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Japan" %}<img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Italy" %}<img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Greece" %}<img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Spain" %}<img src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Turkey" %}<img src="https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Malaysia" %}<img src="https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Vietnam" %}<img src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "South Korea" %}<img src="https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Australia" %}<img src="https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "New Zealand" %}<img src="https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=600&q=85" alt="{{ package.title }}">
+                {% elif d == "Mauritius" %}<img src="https://images.unsplash.com/photo-1589330273594-fade1ee91647?w=600&q=85" alt="{{ package.title }}">
+                {% else %}<img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=600&q=85" alt="{{ package.title }}">
+                {% endif %}
+                {% endwith %}
+                {% endif %}
+                <span class="pkg-badge">{{ package.get_category_display }}</span>
+                <span class="pkg-duration">⏱ {{ package.get_duration_display }}</span>
+            </div>
+            <div class="pkg-body">
+                <h3 class="pkg-title">{{ package.title }}</h3>
+                <p class="pkg-loc">📍 {{ package.destination.name }}, {{ package.destination.country }}</p>
+                <p class="pkg-desc">{{ package.description|truncatewords:18 }}</p>
+                <div class="pkg-includes">
+                    <div class="pkg-inc-item">Complete day-by-day itinerary</div>
+                    <div class="pkg-inc-item">Flights &amp; hotel included</div>
+                    <div class="pkg-inc-item">All activities listed</div>
+                </div>
+                <div class="pkg-pricing">
+                    <div style="display:flex;align-items:baseline;gap:0.4rem;">
+                        <span class="pkg-price">₹{{ package.price_per_person|floatformat:0|intcomma }}</span>
+                        <span class="pkg-price-label">/ person</span>
+                    </div>
+                    {% if package.emi_available %}
+                    <div class="pkg-emi">💳 EMI from ₹{{ package.emi_per_month|floatformat:0|intcomma }}/mo</div>
+                    {% endif %}
+                </div>
+                <div class="pkg-actions">
+                    <a href="{% url 'package_detail' package.id %}" class="btn-detail">View Details →</a>
+                    <a href="{% url 'package_detail' package.id %}" class="btn-book">Book Now</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-results">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.5" style="margin-bottom:1rem;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <p style="font-size:1.1rem;font-weight:700;color:#334155;">No packages found</p>
+            <p style="margin-top:0.4rem;">Try adjusting your filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+</div><!-- page-layout -->
+</div><!-- page-body -->
+
+<script>
+function setChip(fieldId, value, el) {
+    event.preventDefault();
+    document.getElementById(fieldId).value = value;
+    el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+}
+function setBudget(min, max, el) {
+    event.preventDefault();
+    document.querySelector('[name=price_min]').value = min || '';
+    document.querySelector('[name=price_max]').value = max >= 999999 ? '' : max;
+    el.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+}
+function applySort(val) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort', val);
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}

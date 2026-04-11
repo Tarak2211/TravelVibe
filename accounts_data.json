@@ -1,0 +1,30 @@
+[
+  {
+    "username": "admin",
+    "email": "admin@travelvibe.com",
+    "date_joined": "2026-03-03 13:01:21.383245+00:00",
+    "is_active": true,
+    "is_staff": true
+  },
+  {
+    "username": "tarak.patel",
+    "email": "tarak123@gmail.com",
+    "date_joined": "2026-03-12 08:26:10.799519+00:00",
+    "is_active": true,
+    "is_staff": false
+  },
+  {
+    "username": "kavya.shah",
+    "email": "kavyat23@gmail.com",
+    "date_joined": "2026-03-12 08:43:58.639820+00:00",
+    "is_active": true,
+    "is_staff": false
+  },
+   {
+    "username": "Meet",
+    "email": "Meett23@gmail.com",
+    "date_joined": "2025-12-05 08:43:58.639820+00:00",
+    "is_active": true,
+    "is_staff": false
+  }
+]

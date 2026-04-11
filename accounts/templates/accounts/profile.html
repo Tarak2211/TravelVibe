@@ -1,0 +1,288 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}My Profile - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: #f1f5f9; }
+    .profile-page { max-width: 1000px; margin: 2rem auto; padding: 0 1.5rem 3rem; }
+
+    /* Profile Header */
+    .profile-header {
+        background: white; border-radius: 14px; padding: 1.2rem 1.8rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 1.5rem;
+        display: flex; align-items: center; gap: 1.2rem;
+    }
+    .profile-avatar {
+        width: 56px; height: 56px;
+        background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; color: white; font-weight: 700; flex-shrink: 0;
+    }
+    .profile-info h1 { font-size: 1.25rem; color: #1e293b; font-weight: 800; margin-bottom: 0.2rem; }
+    .profile-info p { color: #64748b; font-size: 0.85rem; }
+
+    .section-title {
+        font-size: 1.1rem; font-weight: 800; color: #1e293b;
+        margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    /* ── Booking Card ── */
+    .booking-card {
+        background: white; border-radius: 14px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        margin-bottom: 1.5rem; overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    .booking-card-header {
+        background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+        padding: 0.85rem 1.4rem;
+        display: flex; justify-content: space-between; align-items: center; color: white;
+    }
+    .booking-card-header .bid { font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px; }
+    .status-pill {
+        padding: 0.25rem 0.9rem; border-radius: 20px;
+        font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+    }
+    .status-confirmed { background: #10b981; }
+    .status-pending   { background: #f59e0b; }
+    .status-cancelled { background: #ef4444; }
+    .status-completed { background: #6366f1; }
+
+    /* ── Compact body grid ── */
+    .card-body { padding: 1.2rem 1.4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .info-block { display: flex; flex-direction: column; gap: 0; }
+    .info-block-title {
+        font-size: 0.7rem; font-weight: 800; color: #0ea5e9;
+        text-transform: uppercase; letter-spacing: 1px;
+        margin-bottom: 0.5rem; padding-bottom: 0.4rem;
+        border-bottom: 2px solid #e0f2fe;
+        display: flex; align-items: center; gap: 0.35rem;
+    }
+    .info-row {
+        display: flex; justify-content: space-between; align-items: baseline;
+        padding: 0.32rem 0; border-bottom: 1px solid #f1f5f9; font-size: 0.82rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .lbl { color: #94a3b8; font-weight: 600; flex-shrink: 0; margin-right: 0.5rem; }
+    .info-row .val { color: #1e293b; font-weight: 700; text-align: right; }
+
+    /* ── Flight strip ── */
+    .flights-strip {
+        grid-column: 1 / -1;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    }
+    .flight-box { border: 1.5px solid #e0f2fe; border-radius: 10px; overflow: hidden; }
+    .flight-box-header {
+        background: #f0f9ff; padding: 0.45rem 0.9rem;
+        font-size: 0.7rem; font-weight: 800; color: #0369a1;
+        text-transform: uppercase; letter-spacing: 0.8px;
+        border-bottom: 1px solid #e0f2fe;
+    }
+    .flight-box .info-row { padding: 0.28rem 0.9rem; font-size: 0.8rem; }
+
+    /* ── Traveler chips ── */
+    .traveler-chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.3rem; }
+    .traveler-chip {
+        background: #f0f9ff; border: 1px solid #bae6fd;
+        border-radius: 8px; padding: 0.3rem 0.7rem;
+        font-size: 0.78rem; color: #0369a1; font-weight: 600;
+    }
+
+    /* ── Payment badges ── */
+    .paid-badge   { color: #065f46; background: #d1fae5; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .due-badge    { color: #92400e; background: #fef3c7; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .overdue-badge{ color: #991b1b; background: #fee2e2; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+
+    /* No bookings */
+    .no-bookings {
+        background: white; border-radius: 14px; padding: 3rem 2rem;
+        text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .no-bookings h3 { color: #1e293b; font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .no-bookings p  { color: #64748b; margin-bottom: 1.5rem; }
+    .btn-browse {
+        display: inline-block; padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+        color: white; text-decoration: none; border-radius: 10px;
+        font-weight: 700; font-size: 0.9rem;
+    }
+
+    @media (max-width: 680px) {
+        .card-body { grid-template-columns: 1fr; }
+        .flights-strip { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="profile-avatar">{{ user.username|slice:":1"|upper }}</div>
+        <div class="profile-info">
+            <h1>Hello, {{ user.get_full_name|default:user.username|title }}!</h1>
+            <p>{{ user.email }}{% if user.phone_number %} &nbsp;|&nbsp; {{ user.phone_number }}{% endif %}</p>
+            {% if user.address %}<p style="font-size:.78rem;color:#94a3b8;margin-top:2px;">{{ user.address|truncatechars:80 }}</p>{% endif %}
+        </div>
+        <a href="#edit-profile" onclick="document.getElementById('edit-profile').style.display='block';this.style.display='none';"
+           style="margin-left:auto;background:#0ea5e9;color:#fff;padding:7px 16px;border-radius:8px;font-size:.82rem;font-weight:600;text-decoration:none;white-space:nowrap;">
+           Edit Profile
+        </a>
+    </div>
+
+    <!-- Edit Profile Form (hidden by default) -->
+    <div id="edit-profile" style="display:none;background:white;border-radius:14px;padding:1.5rem 2rem;box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:1.5rem;border:1px solid #e2e8f0;">
+        <div class="section-title" style="margin-bottom:1.2rem;">Edit Profile</div>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">First Name</label>
+                    <input type="text" name="first_name" value="{{ user.first_name }}"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Last Name</label>
+                    <input type="text" name="last_name" value="{{ user.last_name }}"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Phone Number</label>
+                    <input type="text" name="phone_number" value="{{ user.phone_number|default:'' }}"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Aadhar Number</label>
+                    <input type="text" name="aadhar_number" value="{{ user.aadhar_number|default:'' }}" maxlength="12" placeholder="12-digit Aadhar"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+                <div style="grid-column:1/-1;">
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Address</label>
+                    <textarea name="address" rows="2" placeholder="Your full address"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;resize:vertical;">{{ user.address|default:'' }}</textarea>
+                </div>
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Passport Number</label>
+                    <input type="text" name="passport_number" value="{{ user.passport_number|default:'' }}"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+                <div>
+                    <label style="font-size:.8rem;font-weight:600;color:#475569;display:block;margin-bottom:4px;">Passport Expiry</label>
+                    <input type="date" name="passport_expiry" value="{{ user.passport_expiry|date:'Y-m-d'|default:'' }}"
+                        style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:.9rem;box-sizing:border-box;">
+                </div>
+            </div>
+            <div style="margin-top:16px;display:flex;gap:10px;">
+                <button type="submit" style="background:#0ea5e9;color:#fff;padding:9px 22px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.9rem;">Save Changes</button>
+                <button type="button" onclick="document.getElementById('edit-profile').style.display='none';"
+                    style="background:#f1f5f9;color:#475569;padding:9px 22px;border:1px solid #e2e8f0;border-radius:8px;font-weight:600;cursor:pointer;font-size:.9rem;">Cancel</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="section-title">✈️ My Bookings</div>
+
+    {% if bookings %}
+    {% for booking in bookings %}
+    <div class="booking-card">
+
+        <!-- Header -->
+        <div class="booking-card-header">
+            <span class="bid">Booking #{{ booking.booking_id }}</span>
+            <div style="display:flex;align-items:center;gap:0.8rem;">
+                <span style="font-size:0.8rem;opacity:0.85;">{{ booking.created_at|date:"d M Y" }}</span>
+                <span class="status-pill status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Package Info -->
+            <div class="info-block">
+                <div class="info-block-title">📦 Package</div>
+                <div class="info-row"><span class="lbl">Package</span><span class="val">{{ booking.package.title }}</span></div>
+                <div class="info-row"><span class="lbl">Destination</span><span class="val">{{ booking.package.destination.name }}, {{ booking.package.destination.country }}</span></div>
+                <div class="info-row"><span class="lbl">Duration</span><span class="val">{{ booking.package.get_duration_display }}</span></div>
+                <div class="info-row"><span class="lbl">Travel Date</span><span class="val">{{ booking.travel_date|date:"d M Y" }}</span></div>
+                <div class="info-row"><span class="lbl">Travelers</span><span class="val">{{ booking.adults_count }} Adult(s){% if booking.children_count %}, {{ booking.children_count }} Child{% endif %}</span></div>
+            </div>
+
+            <!-- Payment Info -->
+            <div class="info-block">
+                <div class="info-block-title">💰 Payment</div>
+                <div class="info-row"><span class="lbl">Base Fare</span><span class="val">₹{{ booking.base_fare|floatformat:0|intcomma }}</span></div>
+                <div class="info-row"><span class="lbl">Taxes & Fees</span><span class="val">₹{{ booking.tax_amount|floatformat:0|intcomma }}</span></div>
+                {% if booking.discount_amount > 0 %}
+                <div class="info-row"><span class="lbl">Discount</span><span class="val" style="color:#10b981;">- ₹{{ booking.discount_amount|floatformat:0|intcomma }}</span></div>
+                {% endif %}
+                <div class="info-row"><span class="lbl">Total</span><span class="val" style="font-size:0.9rem;">₹{{ booking.total_amount|floatformat:0|intcomma }}</span></div>
+                <div class="info-row"><span class="lbl">Paid</span><span class="val"><span class="paid-badge">₹{{ booking.amount_paid|floatformat:0|intcomma }}</span></span></div>
+                {% if booking.remaining_amount > 0 %}
+                <div class="info-row"><span class="lbl">Balance Due</span><span class="val"><span class="due-badge">₹{{ booking.remaining_amount|floatformat:0|intcomma }}</span></span></div>
+                {% if booking.remaining_due_date %}
+                <div class="info-row"><span class="lbl">Due Date</span><span class="val"><span class="overdue-badge">{{ booking.remaining_due_date|date:"d M Y" }}</span></span></div>
+                {% endif %}
+                {% else %}
+                <div class="info-row"><span class="lbl">Status</span><span class="val"><span class="paid-badge">✅ Fully Paid</span></span></div>
+                {% endif %}
+            </div>
+
+            <!-- Travelers -->
+            {% if booking.travelers.all %}
+            <div class="info-block" style="grid-column:1/-1;">
+                <div class="info-block-title">👥 Travelers</div>
+                <div class="traveler-chips">
+                    {% for t in booking.travelers.all %}
+                    <span class="traveler-chip">{{ t.name }}, {{ t.age }}y, {{ t.get_gender_display }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Flights -->
+            {% if booking.outbound_airline %}
+            <div class="flights-strip">
+                <div class="flight-box">
+                    <div class="flight-box-header">🛫 Outbound — {{ booking.outbound_airline }} {{ booking.outbound_flight_no }}</div>
+                    <div class="info-row"><span class="lbl">Route</span><span class="val">{{ booking.outbound_from }} → {{ booking.outbound_to }}</span></div>
+                    <div class="info-row"><span class="lbl">Departure</span><span class="val">{{ booking.outbound_departure }}</span></div>
+                    <div class="info-row"><span class="lbl">Arrival</span><span class="val">{{ booking.outbound_arrival }}</span></div>
+                    <div class="info-row"><span class="lbl">Duration / Stops</span><span class="val">{{ booking.outbound_duration }}, {{ booking.outbound_stops }} stop(s)</span></div>
+                    <div class="info-row"><span class="lbl">Class</span><span class="val">{{ booking.seat_class }}</span></div>
+                </div>
+                <div class="flight-box">
+                    <div class="flight-box-header">🛬 Return — {{ booking.return_airline }} {{ booking.return_flight_no }}</div>
+                    <div class="info-row"><span class="lbl">Route</span><span class="val">{{ booking.return_from }} → {{ booking.return_to }}</span></div>
+                    <div class="info-row"><span class="lbl">Departure</span><span class="val">{{ booking.return_departure }}</span></div>
+                    <div class="info-row"><span class="lbl">Arrival</span><span class="val">{{ booking.return_arrival }}</span></div>
+                    <div class="info-row"><span class="lbl">Duration / Stops</span><span class="val">{{ booking.return_duration }}, {{ booking.return_stops }} stop(s)</span></div>
+                    <div class="info-row"><span class="lbl">Class</span><span class="val">{{ booking.seat_class }}</span></div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div><!-- /card-body -->
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="no-bookings">
+        <svg width="70" height="70" viewBox="0 0 70 70" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:1rem;">
+            <rect x="10" y="20" width="50" height="38" rx="7" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+            <rect x="10" y="28" width="50" height="8" fill="#bae6fd"/>
+            <circle cx="50" cy="46" r="6" fill="white" stroke="#0ea5e9" stroke-width="2"/>
+            <line x1="47" y1="43" x2="53" y2="49" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+            <line x1="53" y1="43" x2="47" y2="49" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h3>No Bookings Yet</h3>
+        <p>Start your journey by exploring our amazing tour packages!</p>
+        <a href="{% url 'packages' %}" class="btn-browse">Browse Packages</a>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

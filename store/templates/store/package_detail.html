@@ -1,0 +1,1863 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}{{ package.title }} - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: linear-gradient(-45deg, #0ea5e9, #06b6d4, #3b82f6, #8b5cf6);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        position: relative;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    
+    /* Animated Wave Overlay */
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            linear-gradient(115deg, transparent 0%, rgba(255,255,255,0.1) 25%, transparent 50%),
+            linear-gradient(245deg, transparent 0%, rgba(255,255,255,0.1) 25%, transparent 50%);
+        background-size: 200% 200%;
+        animation: waveMove 10s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    @keyframes waveMove {
+        0%, 100% { background-position: 0% 0%; }
+        50% { background-position: 100% 100%; }
+    }
+    
+    /* Floating Bubbles */
+    body::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px),
+            radial-gradient(circle, rgba(255,255,255,0.2) 2px, transparent 2px);
+        background-size: 50px 50px, 80px 80px, 100px 100px;
+        background-position: 0 0, 40px 60px, 130px 270px;
+        animation: bubbleFloat 20s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    @keyframes bubbleFloat {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-100px); }
+    }
+    
+    .container, .package-hero, .info-bar, .content-wrapper, .main-content, .sidebar {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Hero Section with Image Gallery */
+    .package-hero {
+        position: relative;
+        height: 280px;
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        display: flex;
+        align-items: flex-end;
+        padding: 1.5rem;
+    }
+    
+    /* Destination-specific hero images */
+    .hero-goa {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-bali {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-manali {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-paris {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-dubai {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-maldives {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-kerala {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-jaipur {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1599661046289-e31897846e41?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-thailand {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-switzerland {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1527668752968-14dc70a27c95?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-singapore {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-udaipur {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1597074866923-dc0589150358?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-rishikesh {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1626621341912-ab7c2cb44a49?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-andaman {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-lehladakh, .hero-leh {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-malaysia {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-vietnam {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1528127269322-539801943592?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-turkey {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-greece {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-japan {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-italy {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-spain {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-australia {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-newzealand {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .hero-mauritius {
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    /* Image Gallery Section */
+    .image-gallery {
+        max-width: 1400px;
+        margin: -30px auto 0;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.9rem;
+        background: white;
+        padding: 1.2rem;
+        border-radius: 16px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .gallery-item {
+        position: relative;
+        height: 170px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+        z-index: 5;
+    }
+    
+    .gallery-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .gallery-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+        padding: 1.5rem 0.8rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .hero-content {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .category-badge {
+        display: inline-block;
+        padding: 0.4rem 1rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    
+    .hero-content h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin-bottom: 0.6rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    
+    .hero-location {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Main Container */
+    .detail-wrapper {
+        max-width: 1400px;
+        margin: 1.5rem auto 0;
+        padding: 0 1.5rem 3rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* Top Info Bar */
+    .info-bar {
+        background: white;
+        padding: 1.2rem 1.5rem;
+        border-radius: 12px 12px 0 0;
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    
+    .info-icon {
+        width: 38px;
+        height: 38px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+    }
+    
+    .info-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-size: 0.95rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+    
+    /* Main Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 320px;
+        gap: 1.5rem;
+        margin-top: 0;
+    }
+    
+    /* Left Column - Itinerary */
+    .itinerary-section {
+        background: white;
+        border-radius: 0 0 16px 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1.8rem;
+        padding-bottom: 1.2rem;
+        border-bottom: 3px solid #0ea5e9;
+    }
+    
+    .section-header h2 {
+        font-size: 1.6rem;
+        color: #1e293b;
+        font-weight: 800;
+    }
+    
+    /* Day Timeline */
+    .itinerary-timeline {
+        position: relative;
+        padding-left: 2.5rem;
+    }
+    
+    .itinerary-timeline::before {
+        content: '';
+        position: absolute;
+        left: 17px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: linear-gradient(180deg, #0ea5e9 0%, #06b6d4 100%);
+    }
+    
+    .day-item {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-left: 1.5rem;
+    }
+    
+    .day-marker {
+        position: absolute;
+        left: -2.3rem;
+        top: 0;
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 0.8rem;
+        box-shadow: 0 3px 12px rgba(14, 165, 233, 0.4);
+        z-index: 2;
+    }
+    
+    .day-header {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 1.1rem;
+        border-radius: 12px;
+        margin-bottom: 1.1rem;
+        border-left: 3px solid #0ea5e9;
+    }
+    
+    .day-title {
+        font-size: 1.2rem;
+        color: #0ea5e9;
+        font-weight: 800;
+        margin-bottom: 0.4rem;
+    }
+    
+    .day-subtitle {
+        color: #64748b;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    /* Flight/Train Cards */
+    .transport-card {
+        background: white;
+        border: 2px solid #e0e7ff;
+        border-radius: 12px;
+        padding: 1.1rem;
+        margin: 0.8rem 0;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1.5rem;
+        align-items: center;
+    }
+    
+    .transport-icon {
+        width: 42px;
+        height: 42px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+    
+    .transport-details {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .transport-time {
+        text-align: center;
+    }
+    
+    .time-value {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+    
+    .time-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        margin-top: 0.3rem;
+    }
+    
+    .transport-arrow {
+        color: #0ea5e9;
+        font-size: 1.5rem;
+    }
+    
+    .transport-price {
+        text-align: right;
+    }
+    
+    .price-value {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #10b981;
+    }
+    
+    .price-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.3rem;
+    }
+    
+    /* Activity Cards */
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .activity-item {
+        background: #f8fafc;
+        padding: 1.2rem;
+        border-radius: 12px;
+        border-left: 4px solid #10b981;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .activity-icon {
+        font-size: 1.5rem;
+    }
+    
+    .activity-text {
+        flex: 1;
+        color: #475569;
+        line-height: 1.6;
+    }
+    
+    .activity-cost {
+        font-weight: 700;
+        color: #0ea5e9;
+        white-space: nowrap;
+    }
+    
+    /* Right Sidebar - Pricing */
+    .sidebar {
+        position: sticky;
+        top: 80px;
+        height: fit-content;
+    }
+    
+    .price-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.2rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .price-header {
+        text-align: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .price-main {
+        font-size: 1.7rem;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        line-height: 1;
+    }
+    
+    .price-subtitle {
+        color: #64748b;
+        font-size: 0.8rem;
+        margin-top: 0.4rem;
+    }
+    
+    .pricing-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .pricing-option {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        padding: 0.9rem;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .pricing-option:hover {
+        border-color: #0ea5e9;
+        transform: translateX(3px);
+    }
+
+    .pricing-option.active {
+        border-color: #0ea5e9;
+        background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+        transform: translateX(3px);
+        box-shadow: 0 4px 15px rgba(14,165,233,0.35);
+    }
+
+    .pricing-option.active .option-label {
+        color: #fff;
+    }
+
+    .pricing-option.active .option-price {
+        color: #fff;
+    }
+    
+    .option-label {
+        font-weight: 700;
+        color: #475569;
+        font-size: 0.85rem;
+    }
+    
+    .option-price {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #0ea5e9;
+    }
+    
+    .emi-card {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1.2rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .emi-badge {
+        font-size: 0.7rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.4rem;
+    }
+    
+    .emi-amount {
+        font-size: 1.2rem;
+        font-weight: 900;
+        margin-top: 0.4rem;
+    }
+    
+    .book-button {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white;
+        text-align: center;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 18px rgba(14, 165, 233, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .book-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.6);
+    }
+    
+    /* Inclusions/Exclusions */
+    .inclusions-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        margin-top: 1.5rem;
+    }
+    
+    .inclusions-grid {
+        display: grid;
+        gap: 0.7rem;
+        margin-top: 1.2rem;
+    }
+    
+    .inclusion-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0.8rem;
+        background: #f8fafc;
+        border-radius: 8px;
+        border-left: 3px solid #10b981;
+        font-size: 0.85rem;
+    }
+    
+    .inclusion-icon {
+        color: #10b981;
+        font-size: 1.1rem;
+    }
+    
+    .exclusion-item {
+        border-left-color: #ef4444;
+    }
+    
+    .exclusion-icon {
+        color: #ef4444;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            position: static;
+        }
+    }
+    
+    /* Flight Booking Modal - Compact & Professional */
+    .flight-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .flight-modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        max-width: 1100px;
+        width: 100%;
+        max-height: 95vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white;
+        padding: 1.3rem 1.8rem;
+        border-radius: 20px 20px 0 0;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .modal-header h2 {
+        font-size: 1.5rem;
+        font-weight: 900;
+        margin-bottom: 0.3rem;
+    }
+
+    .modal-header p {
+        opacity: 0.95;
+        font-size: 0.9rem;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 35px;
+        height: 35px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.3rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: rotate(90deg);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .flight-step {
+        margin-bottom: 2rem;
+    }
+
+    .flight-step:last-child {
+        margin-bottom: 0;
+    }
+
+    .step-header {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.8rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    .step-number {
+        width: 35px;
+        height: 35px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 900;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+
+    .step-title {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+
+    .flight-options-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .flight-option-card {
+        background: #ffffff;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .flight-option-card:hover {
+        border-color: #0ea5e9;
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .flight-option-card.selected {
+        border-color: #0ea5e9;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        box-shadow: 0 6px 20px rgba(14, 165, 233, 0.2);
+    }
+
+    .flight-main-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .airline-section {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+
+    .airline-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 900;
+        font-size: 1.1rem;
+        box-shadow: 0 3px 10px rgba(14, 165, 233, 0.3);
+        flex-shrink: 0;
+    }
+
+    .airline-name {
+        font-size: 1.05rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.2rem;
+    }
+
+    .flight-number {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .direct-badge {
+        padding: 0.4rem 0.9rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .flight-timing {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 1.2rem;
+        align-items: center;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+
+    .timing-point {
+        text-align: center;
+    }
+
+    .time-large {
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+    }
+
+    .location-text {
+        font-size: 0.75rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .timing-divider {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .plane-icon {
+        font-size: 1.3rem;
+        color: #0ea5e9;
+    }
+
+    .duration-text {
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .seat-classes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.8rem;
+    }
+
+    .class-option {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.9rem 0.7rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .class-option:hover {
+        border-color: #0ea5e9;
+        transform: scale(1.02);
+    }
+
+    .class-option.selected {
+        border-color: #0ea5e9;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
+
+    .class-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .class-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .class-price-large {
+        font-size: 1.3rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0.5rem;
+    }
+
+    .class-benefits {
+        font-size: 0.65rem;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    .class-benefits div {
+        margin: 0.2rem 0;
+    }
+
+    .modal-footer {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        padding: 1.2rem 1.8rem;
+        border-radius: 0 0 20px 20px;
+        position: sticky;
+        bottom: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid #e2e8f0;
+        gap: 1.5rem;
+    }
+
+    .price-summary {
+        flex: 1;
+    }
+
+    .price-breakdown {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.4rem;
+        font-weight: 600;
+    }
+
+    .total-amount {
+        font-size: 1.8rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .confirm-booking-btn {
+        padding: 1rem 2.5rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        white-space: nowrap;
+    }
+
+    .confirm-booking-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+    }
+
+    .confirm-booking-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: none;
+    }
+
+    .selection-indicator {
+        display: inline-block;
+        padding: 0.3rem 0.8rem;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 15px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-left: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="package-hero hero-{{ package.destination.name|lower|cut:' '|cut:',' }}">
+    <div class="hero-content">
+        <h1>{{ package.title }}</h1>
+        <p class="hero-location">
+            <span>📍</span>
+            <span>{{ package.destination.name }}, {{ package.destination.country }}</span>
+        </p>
+    </div>
+</section>
+
+<!-- Image Gallery -->
+<div class="image-gallery">
+    <div class="gallery-grid">
+        {% for image in gallery %}
+        <div class="gallery-item">
+            <img src="{{ image.url }}" alt="{{ image.label }}">
+            <div class="gallery-label">{{ image.label }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="detail-wrapper">
+    <!-- Info Bar -->
+    <div class="info-bar">
+        <div class="info-item">
+            <div class="info-icon">⏱️</div>
+            <div class="info-text">
+                <span class="info-label">Duration</span>
+                <span class="info-value">{{ package.get_duration_display }}</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">✈️</div>
+            <div class="info-text">
+                <span class="info-label">Flights Included</span>
+                <span class="info-value">Round Trip</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">🏨</div>
+            <div class="info-text">
+                <span class="info-label">Hotels</span>
+                <span class="info-value">4-Star Premium</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">🍽️</div>
+            <div class="info-text">
+                <span class="info-label">Meals</span>
+                <span class="info-value">All Included</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Left Column - Itinerary -->
+        <div class="itinerary-section">
+            <div class="section-header">
+                <span style="font-size: 2.5rem;">🗓️</span>
+                <h2>Complete Day-by-Day Itinerary</h2>
+            </div>
+
+            <div class="itinerary-timeline">
+                <div class="day-item">
+                    <div class="day-marker">📅</div>
+                    <div class="day-header">
+                        <h3 class="day-title">Complete Itinerary</h3>
+                        <p class="day-subtitle">Day-by-day breakdown with all details</p>
+                    </div>
+                    
+                    <!-- Detailed Itinerary Text -->
+                    <div style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); padding: 2rem; border-radius: 15px;">
+                        <h4 style="color: #0ea5e9; font-size: 1.3rem; font-weight: 800; margin-bottom: 1.5rem;">📋 Detailed Day-by-Day Plan</h4>
+                        <div class="day-content" style="white-space: pre-line; line-height: 1.8; color: #475569; font-size: 1.05rem;">
+                            {{ package.itinerary }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inclusions -->
+            <div class="inclusions-card" style="margin-top: 3rem;">
+                <div class="section-header">
+                    <span style="font-size: 2rem;">✅</span>
+                    <h2>What's Included</h2>
+                </div>
+                <div class="inclusions-grid">
+                    {% for inclusion in package.get_inclusions_list %}
+                    <div class="inclusion-item">
+                        <span class="inclusion-icon">✓</span>
+                        <span>{{ inclusion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Exclusions -->
+            <div class="inclusions-card">
+                <div class="section-header">
+                    <span style="font-size: 2rem;">❌</span>
+                    <h2>What's Not Included</h2>
+                </div>
+                <div class="inclusions-grid">
+                    {% for exclusion in package.get_exclusions_list %}
+                    <div class="inclusion-item exclusion-item">
+                        <span class="exclusion-icon">✗</span>
+                        <span>{{ exclusion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ── DESTINATION MAP ─────────────────────────────────────── -->
+            <div class="inclusions-card" style="margin-top:2rem;">
+                <div class="section-header">
+                    <span style="font-size:2rem;">🗺️</span>
+                    <h2>Destination Map</h2>
+                </div>
+                <p style="color:#64748b;font-size:0.9rem;margin-bottom:1rem;">
+                    Explore <strong>{{ package.destination.name }}, {{ package.destination.country }}</strong> — see all the places we'll take you.
+                </p>
+                <!-- Map embed -->
+                <div style="border-radius:14px;overflow:hidden;border:2px solid #e0f2fe;box-shadow:0 4px 20px rgba(14,165,233,0.1);">
+                    <iframe
+                        width="100%"
+                        height="380"
+                        style="border:0;display:block;"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="https://maps.google.com/maps?q={{ package.destination.name|urlencode }},{{ package.destination.country|urlencode }}&output=embed&z=10">
+                    </iframe>
+                </div>
+                <!-- Distance info bar -->
+                <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+                    <div style="flex:1;min-width:140px;background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border-radius:12px;padding:0.9rem 1rem;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:900;color:#0ea5e9;">{{ package.duration }}</div>
+                        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Days Duration</div>
+                    </div>
+                    <div style="flex:1;min-width:140px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:12px;padding:0.9rem 1rem;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:900;color:#10b981;">{{ package.destination.country }}</div>
+                        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Country</div>
+                    </div>
+                    <div style="flex:1;min-width:140px;background:linear-gradient(135deg,#fdf4ff,#f3e8ff);border-radius:12px;padding:0.9rem 1rem;text-align:center;">
+                        <div style="font-size:1.3rem;font-weight:900;color:#8b5cf6;">{{ package.get_category_display }}</div>
+                        <div style="font-size:0.75rem;color:#64748b;margin-top:2px;">Trip Type</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── GROUP MOMENTS / MEDIA GALLERY ──────────────────────── -->
+            <div class="inclusions-card" style="margin-top:2rem;">
+                <div class="section-header">
+                    <span style="font-size:2rem;">📸</span>
+                    <h2>Group Moments</h2>
+                </div>
+                <p style="color:#64748b;font-size:0.9rem;margin-bottom:1.2rem;">
+                    Real memories from our previous groups — adventures, rides, and pure enjoyment!
+                </p>
+
+                <!-- Photo grid -->
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-bottom:1.2rem;">
+                    {% for photo in moments %}
+                    <div style="border-radius:12px;overflow:hidden;height:140px;position:relative;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.15);transition:transform 0.2s;" onclick="openLightbox(this)" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="{{ photo.url }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ photo.label }}" loading="lazy">
+                        <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.72));"></div>
+                        <div style="position:absolute;bottom:0;left:0;right:0;padding:8px 10px;color:#fff;font-size:0.72rem;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,0.5);">{{ photo.label }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- YouTube link -->
+                <a href="https://www.youtube.com/results?search_query={{ package.destination.name|urlencode }}+travel+vlog+group+trip+most+viewed"
+                   target="_blank" rel="noopener"
+                   style="display:flex;align-items:center;justify-content:center;gap:0.8rem;background:#ff0000;color:#fff;border-radius:14px;padding:1.1rem;text-decoration:none;font-weight:700;font-size:1rem;margin-top:0.5rem;transition:all 0.2s;box-shadow:0 4px 12px rgba(255,0,0,0.25);"
+                   onmouseover="this.style.opacity='0.88';this.style.transform='translateY(-2px)'" onmouseout="this.style.opacity='1';this.style.transform='translateY(0)'">
+                    <svg width="28" height="20" viewBox="0 0 28 20" fill="white"><path d="M27.4 3.1a3.5 3.5 0 0 0-2.5-2.5C22.8 0 14 0 14 0S5.2 0 3.1.6A3.5 3.5 0 0 0 .6 3.1C0 5.2 0 10 0 10s0 4.8.6 6.9a3.5 3.5 0 0 0 2.5 2.5C5.2 20 14 20 14 20s8.8 0 10.9-.6a3.5 3.5 0 0 0 2.5-2.5C28 14.8 28 10 28 10s0-4.8-.6-6.9z"/><polygon points="11,14.5 18.5,10 11,5.5" fill="#ff0000"/></svg>
+                    Watch {{ package.destination.name }} Travel Vlogs on YouTube
+                </a>
+                <p style="text-align:center;color:#94a3b8;font-size:0.75rem;margin-top:0.6rem;">Real travel vlogs from {{ package.destination.name }}</p>
+            </div>
+
+        </div>
+
+        <!-- Right Sidebar - Pricing -->
+        <div class="sidebar">
+            <div class="price-card">
+                <div class="price-header">
+                    <div class="price-main">₹{{ package.price_per_person|floatformat:0|intcomma }}</div>
+                    <p class="price-subtitle">Starting price per person</p>
+                </div>
+
+                <div class="pricing-options">
+                    <div class="pricing-option active" onclick="selectPricing(this, '{{ package.price_per_person|floatformat:0 }}', 'per person')">
+                        <span class="option-label">👤 Per Person</span>
+                        <span class="option-price">₹{{ package.price_per_person|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="pricing-option" onclick="selectPricing(this, '{{ package.price_per_couple|floatformat:0 }}', 'for couple')">
+                        <span class="option-label">💑 For Couple</span>
+                        <span class="option-price">₹{{ package.price_per_couple|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="pricing-option" onclick="selectPricing(this, '{{ package.price_per_group|floatformat:0 }}', 'for group (4+)')">
+                        <span class="option-label">👨‍👩‍👧‍👦 Group (4+)</span>
+                        <span class="option-price">₹{{ package.price_per_group|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+
+                {% if package.emi_available %}
+                <div class="emi-card">
+                    <div class="emi-badge">🎉 No Cost EMI Available</div>
+                    <div>Starting at</div>
+                    <div class="emi-amount">₹{{ package.emi_per_month|floatformat:0|intcomma }}/month</div>
+                </div>
+                {% endif %}
+
+                <button class="book-button" onclick="openFlightModal()">BOOK NOW →</button>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="price-card">
+                <h3 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: #1e293b; font-weight: 800;">📋 Package Details</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Category</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.get_category_display }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Destination</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.destination.name }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Available From</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.available_from|date:"d M Y" }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0;">
+                        <span style="color: #64748b;">Popularity</span>
+                        <span style="color: #1e293b; font-weight: 700;">⭐ {{ package.popularity_score }}/100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Flight Booking Modal -->
+<div id="flightModal" class="flight-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>✈️ Book Your Flights to {{ package.destination.name }}</h2>
+            <p>Select your preferred airline and seat class for the best travel experience</p>
+            <button class="modal-close" onclick="closeFlightModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            {% if flights %}
+            <!-- Step 1: Outbound Flight -->
+            <div class="flight-step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">🛫 Outbound Journey</div>
+                    <span id="outbound-selected" class="selection-indicator" style="display: none;">✓ Selected</span>
+                </div>
+
+                <div class="flight-options-list">
+                    {% for flight in flights.outbound %}
+                    <div class="flight-option-card" data-flight-index="{{ forloop.counter0 }}" data-direction="outbound">
+                        <div class="flight-main-info">
+                            <div class="airline-section">
+                                <div class="airline-icon">{{ flight.airline|slice:":2"|upper }}</div>
+                                <div>
+                                    <div class="airline-name">{{ flight.airline }}</div>
+                                    <div class="flight-number">{{ flight.flight_no }}</div>
+                                </div>
+                            </div>
+                            <div class="direct-badge">{{ flight.stops }}</div>
+                        </div>
+
+                        <div class="flight-timing">
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.departure }}</div>
+                                <div class="location-text">{{ flight.from }}</div>
+                            </div>
+                            <div class="timing-divider">
+                                <div class="plane-icon">✈</div>
+                                <div class="duration-text">{{ flight.duration }}</div>
+                            </div>
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.arrival }}</div>
+                                <div class="location-text">{{ flight.to }}</div>
+                            </div>
+                        </div>
+
+                        <div class="seat-classes">
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="economy-{{ forloop.counter0 }}" data-price="{{ flight.economy }}" data-class="Economy">
+                                <div class="class-label">💺 Economy</div>
+                                <div class="class-price-large">₹{{ flight.economy|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 15kg Check-in</div>
+                                    <div>✓ 7kg Cabin</div>
+                                    <div>✓ Meals Included</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="premium-{{ forloop.counter0 }}" data-price="{{ flight.premium }}" data-class="Premium Economy">
+                                <div class="class-label">⭐ Premium</div>
+                                <div class="class-price-large">₹{{ flight.premium|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 25kg Check-in</div>
+                                    <div>✓ Priority Boarding</div>
+                                    <div>✓ Extra Legroom</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="business-{{ forloop.counter0 }}" data-price="{{ flight.business }}" data-class="Business Class">
+                                <div class="class-label">👔 Business</div>
+                                <div class="class-price-large">₹{{ flight.business|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 40kg Check-in</div>
+                                    <div>✓ Lounge Access</div>
+                                    <div>✓ Lie-flat Seats</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="display:flex;align-items:center;gap:1.2rem;padding:1.5rem;background:#f8fafc;border-radius:12px;border:2px dashed #cbd5e1;">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                            <circle cx="24" cy="24" r="22" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+                            <path d="M14 28 L22 18 L30 22 L24 26 Z" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+                            <path d="M20 27 L16 34 L26 30 Z" fill="#bae6fd" stroke="#0ea5e9" stroke-width="1" stroke-linejoin="round"/>
+                            <line x1="30" y1="22" x2="36" y2="18" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round"/>
+                            <line x1="32" y1="30" x2="38" y2="30" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="32" y1="33" x2="36" y2="33" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <div>
+                            <div style="font-weight:700;color:#1e293b;font-size:0.95rem;margin-bottom:0.3rem;">No Outbound Flights Available</div>
+                            <div style="color:#64748b;font-size:0.82rem;">Live flight data for this route is currently unavailable. Our team will assign the best available flight and confirm your booking shortly.</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Step 2: Return Flight -->
+            <div class="flight-step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">🛬 Return Journey</div>
+                    <span id="return-selected" class="selection-indicator" style="display: none;">✓ Selected</span>
+                </div>
+
+                <div class="flight-options-list">
+                    {% for flight in flights.return %}
+                    <div class="flight-option-card" data-flight-index="{{ forloop.counter0 }}" data-direction="return">
+                        <div class="flight-main-info">
+                            <div class="airline-section">
+                                <div class="airline-icon">{{ flight.airline|slice:":2"|upper }}</div>
+                                <div>
+                                    <div class="airline-name">{{ flight.airline }}</div>
+                                    <div class="flight-number">{{ flight.flight_no }}</div>
+                                </div>
+                            </div>
+                            <div class="direct-badge">{{ flight.stops }}</div>
+                        </div>
+
+                        <div class="flight-timing">
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.departure }}</div>
+                                <div class="location-text">{{ flight.from }}</div>
+                            </div>
+                            <div class="timing-divider">
+                                <div class="plane-icon">✈</div>
+                                <div class="duration-text">{{ flight.duration }}</div>
+                            </div>
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.arrival }}</div>
+                                <div class="location-text">{{ flight.to }}</div>
+                            </div>
+                        </div>
+
+                        <div class="seat-classes">
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="economy-{{ forloop.counter0 }}" data-price="{{ flight.economy }}" data-class="Economy">
+                                <div class="class-label">💺 Economy</div>
+                                <div class="class-price-large">₹{{ flight.economy|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 15kg Check-in</div>
+                                    <div>✓ 7kg Cabin</div>
+                                    <div>✓ Meals Included</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="premium-{{ forloop.counter0 }}" data-price="{{ flight.premium }}" data-class="Premium Economy">
+                                <div class="class-label">⭐ Premium</div>
+                                <div class="class-price-large">₹{{ flight.premium|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 25kg Check-in</div>
+                                    <div>✓ Priority Boarding</div>
+                                    <div>✓ Extra Legroom</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="business-{{ forloop.counter0 }}" data-price="{{ flight.business }}" data-class="Business Class">
+                                <div class="class-label">👔 Business</div>
+                                <div class="class-price-large">₹{{ flight.business|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 40kg Check-in</div>
+                                    <div>✓ Lounge Access</div>
+                                    <div>✓ Lie-flat Seats</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="display:flex;align-items:center;gap:1.2rem;padding:1.5rem;background:#f8fafc;border-radius:12px;border:2px dashed #cbd5e1;">
+                        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                            <circle cx="24" cy="24" r="22" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+                            <path d="M34 28 L26 18 L18 22 L24 26 Z" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+                            <path d="M28 27 L32 34 L22 30 Z" fill="#bae6fd" stroke="#0ea5e9" stroke-width="1" stroke-linejoin="round"/>
+                            <line x1="18" y1="22" x2="12" y2="18" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="2 2" stroke-linecap="round"/>
+                            <line x1="10" y1="30" x2="16" y2="30" stroke="#94a3b8" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="12" y1="33" x2="16" y2="33" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <div>
+                            <div style="font-weight:700;color:#1e293b;font-size:0.95rem;margin-bottom:0.3rem;">No Return Flights Available</div>
+                            <div style="color:#64748b;font-size:0.82rem;">Live flight data for this route is currently unavailable. Our team will assign the best available return flight and confirm your booking shortly.</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div style="display:flex;align-items:center;gap:1.2rem;padding:2rem;background:#f8fafc;border-radius:12px;border:2px dashed #cbd5e1;margin:1rem;">
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+                    <circle cx="28" cy="28" r="26" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2"/>
+                    <path d="M16 32 L26 20 L36 25 L28 30 Z" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M23 31 L18 40 L30 35 Z" fill="#bae6fd" stroke="#0ea5e9" stroke-width="1" stroke-linejoin="round"/>
+                    <line x1="36" y1="25" x2="44" y2="20" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round"/>
+                    <circle cx="46" cy="18" r="4" fill="#0ea5e9" opacity="0.4"/>
+                </svg>
+                <div>
+                    <div style="font-weight:800;color:#1e293b;font-size:1rem;margin-bottom:0.4rem;">Flight Information Coming Soon</div>
+                    <div style="color:#64748b;font-size:0.85rem;line-height:1.6;">We're fetching the latest flight options for <strong>{{ package.destination.name }}</strong>. Our travel experts will contact you with the best available flights within 24 hours of booking.</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="modal-footer">
+            <div class="price-summary">
+                <div class="price-breakdown" id="price-breakdown">Select both flights to see total price</div>
+                <div class="total-amount" id="total-price">₹0</div>
+            </div>
+            <button class="confirm-booking-btn" id="confirm-btn" disabled onclick="confirmBooking()">
+                CONFIRM BOOKING
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedFlights = {
+    outbound: { flight: null, class: null, price: 0 },
+    return: { flight: null, class: null, price: 0 }
+};
+
+function selectPricing(el, rawPrice, label) {
+    // Remove active from all options
+    document.querySelectorAll('.pricing-option').forEach(o => o.classList.remove('active'));
+    el.classList.add('active');
+    // Format price with Indian comma style
+    const num = parseInt(rawPrice);
+    const formatted = num.toLocaleString('en-IN');
+    document.querySelector('.price-main').textContent = '₹' + formatted;
+    document.querySelector('.price-subtitle').textContent = 'Starting price ' + label;
+}
+
+function openFlightModal() {
+    document.getElementById('flightModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFlightModal() {
+    document.getElementById('flightModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.getElementById('flightModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeFlightModal();
+    }
+});
+
+// Handle flight card selection
+document.querySelectorAll('.flight-option-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+        
+        const direction = this.dataset.direction;
+        const flightIndex = this.dataset.flightIndex;
+        
+        // Remove selection from other cards in same direction
+        document.querySelectorAll(`.flight-option-card[data-direction="${direction}"]`).forEach(c => {
+            c.classList.remove('selected');
+        });
+        
+        // Add selection to this card
+        this.classList.add('selected');
+        
+        // Store flight selection
+        selectedFlights[direction].flight = flightIndex;
+        
+        // Show selection indicator
+        document.getElementById(`${direction}-selected`).style.display = 'inline-block';
+        
+        updateTotal();
+    });
+});
+
+// Handle seat class selection
+document.querySelectorAll('.class-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+        
+        // Remove selected from siblings
+        this.parentElement.querySelectorAll('.class-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected to this option
+        this.classList.add('selected');
+        
+        // Get direction from radio name
+        const direction = radio.name.includes('outbound') ? 'outbound' : 'return';
+        
+        // Store class and price
+        selectedFlights[direction].class = radio.dataset.class;
+        selectedFlights[direction].price = parseInt(radio.dataset.price);
+        
+        updateTotal();
+    });
+});
+
+function updateTotal() {
+    const outboundPrice = selectedFlights.outbound.price || 0;
+    const returnPrice = selectedFlights.return.price || 0;
+    const total = outboundPrice + returnPrice;
+    
+    // Update total display
+    document.getElementById('total-price').textContent = '₹' + total.toLocaleString('en-IN');
+    
+    // Update breakdown
+    let breakdown = '';
+    if (selectedFlights.outbound.class && selectedFlights.return.class) {
+        breakdown = `Outbound (${selectedFlights.outbound.class}): ₹${outboundPrice.toLocaleString('en-IN')} + Return (${selectedFlights.return.class}): ₹${returnPrice.toLocaleString('en-IN')}`;
+        document.getElementById('confirm-btn').disabled = false;
+    } else if (selectedFlights.outbound.class) {
+        breakdown = `Outbound flight selected - Please select return flight`;
+        document.getElementById('confirm-btn').disabled = true;
+    } else if (selectedFlights.return.class) {
+        breakdown = `Return flight selected - Please select outbound flight`;
+        document.getElementById('confirm-btn').disabled = true;
+    } else {
+        breakdown = 'Select flights to see total price';
+        document.getElementById('confirm-btn').disabled = true;
+    }
+    
+    document.getElementById('price-breakdown').textContent = breakdown;
+}
+
+function confirmBooking() {
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true;
+    btn.textContent = 'BOOKING...';
+
+    // Collect selected flight data from the cards
+    const outboundCard = document.querySelector('.flight-option-card[data-direction="outbound"].selected');
+    const returnCard   = document.querySelector('.flight-option-card[data-direction="return"].selected');
+
+    const outboundRadio = document.querySelector('input[name="outbound-class"]:checked');
+    const returnRadio   = document.querySelector('input[name="return-class"]:checked');
+
+    // Build flight objects from visible card data
+    function getFlightData(card, radio) {
+        if (!card) return {};
+        return {
+            airline:    card.querySelector('.airline-name')?.textContent || '',
+            flight_no:  card.querySelector('.flight-number')?.textContent || '',
+            from:       card.querySelectorAll('.location-text')[0]?.textContent || '',
+            to:         card.querySelectorAll('.location-text')[1]?.textContent || '',
+            departure:  card.querySelectorAll('.time-large')[0]?.textContent || '',
+            arrival:    card.querySelectorAll('.time-large')[1]?.textContent || '',
+            duration:   card.querySelector('.duration-text')?.textContent || '',
+            stops:      card.querySelector('.direct-badge')?.textContent || 'Direct',
+            seat_class: radio ? radio.dataset.class : 'Economy',
+        };
+    }
+
+    const payload = {
+        package_id: {{ package.id }},
+        adults: 1,
+        children: 0,
+        travel_date: '',
+        total_flight_price: selectedFlights.outbound.price + selectedFlights.return.price,
+        outbound: getFlightData(outboundCard, outboundRadio),
+        return:   getFlightData(returnCard, returnRadio),
+        travelers: [],
+    };
+
+    fetch('{% url "create_booking" package.id %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '',
+        },
+        body: JSON.stringify(payload),
+    })
+    .then(r => {
+        if (!r.ok && r.status === 401) {
+            window.location.href = '/accounts/login/?next=' + window.location.pathname;
+            return;
+        }
+        return r.json().catch(() => {
+            throw new Error('Server returned non-JSON response (status ' + r.status + '). Check if you are logged in.');
+        });
+    })
+    .then(data => {
+        if (!data) return;
+        if (data.success) {
+            closeFlightModal();
+            // Show success overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;';
+            overlay.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:2.5rem;max-width:480px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+                    <div style="width:64px;height:64px;background:linear-gradient(135deg,#10b981,#059669);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.2rem;font-size:1.8rem;color:white;">✓</div>
+                    <h2 style="color:#1e293b;font-size:1.4rem;font-weight:800;margin-bottom:0.5rem;">Booking Confirmed!</h2>
+                    <p style="color:#64748b;margin-bottom:1.5rem;font-size:0.9rem;">Your booking details have been sent to your email and phone.</p>
+                    <table style="width:100%;border-collapse:collapse;font-size:0.88rem;margin-bottom:1.5rem;text-align:left;">
+                        <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:0.6rem;color:#64748b;">Booking ID</td><td style="padding:0.6rem;font-weight:700;color:#0ea5e9;">${data.booking_id}</td></tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:0.6rem;color:#64748b;">Total Amount</td><td style="padding:0.6rem;font-weight:700;">₹${parseFloat(data.total_amount).toLocaleString('en-IN')}</td></tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:0.6rem;color:#64748b;">Paid Now (50%)</td><td style="padding:0.6rem;font-weight:700;color:#10b981;">₹${parseFloat(data.amount_paid).toLocaleString('en-IN')}</td></tr>
+                        <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:0.6rem;color:#64748b;">Remaining</td><td style="padding:0.6rem;font-weight:700;color:#f59e0b;">₹${parseFloat(data.remaining).toLocaleString('en-IN')}</td></tr>
+                        <tr><td style="padding:0.6rem;color:#64748b;">Due Date</td><td style="padding:0.6rem;font-weight:700;color:#ef4444;">${data.due_date}</td></tr>
+                    </table>
+                    <a href="/accounts/profile/" style="display:inline-block;padding:0.75rem 2rem;background:linear-gradient(135deg,#0ea5e9,#06b6d4);color:white;border-radius:10px;font-weight:700;text-decoration:none;font-size:0.9rem;">View My Bookings →</a>
+                </div>`;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', e => { if(e.target===overlay) overlay.remove(); });
+        } else {
+            alert('Booking failed: ' + (data.error || 'Unknown error'));
+            btn.disabled = false;
+            btn.textContent = 'CONFIRM BOOKING';
+        }
+    })
+    .catch(err => {
+        console.error('Booking error:', err);
+        alert('Error: ' + err.message + '\n\nMake sure you are logged in.');
+        btn.disabled = false;
+        btn.textContent = 'CONFIRM BOOKING';
+    });
+}
+// Lightbox for group moments photos
+function openLightbox(el) {
+    const img = el.querySelector('img');
+    const label = el.querySelector('div').textContent;
+    const lb = document.createElement('div');
+    lb.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;';
+    lb.innerHTML = `<img src="${img.src.replace('w=600','w=1200')}" style="max-width:90vw;max-height:80vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.5);">
+        <p style="color:#fff;margin-top:1rem;font-size:1rem;font-weight:600;">${label}</p>
+        <p style="color:#94a3b8;font-size:0.8rem;margin-top:0.3rem;">Click anywhere to close</p>`;
+    lb.onclick = () => lb.remove();
+    document.body.appendChild(lb);
+}
+</script>
+
+{% endblock %}

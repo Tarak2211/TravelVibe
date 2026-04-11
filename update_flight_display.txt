@@ -1,0 +1,15 @@
+I need to add beautiful flight selection cards to the package detail page. Here's what needs to be added:
+
+1. Create a new "Flight Options" section before the itinerary
+2. Show multiple airlines with different seat classes
+3. Display flight details in attractive cards
+4. Allow users to see pricing for Economy, Premium Economy, and Business class
+
+The design should include:
+- Airline logos/names
+- Departure and arrival times with duration
+- Seat class options with prices
+- Direct/Stop information
+- Selection radio buttons
+
+This will be added as a separate section in the package detail template between the info bar and itinerary section.

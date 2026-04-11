@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Booking Confirmed — TravelVibe</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f9ff;font-family:'Segoe UI',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f9ff;padding:32px 12px;">
+<tr><td align="center">
+<table width="620" cellpadding="0" cellspacing="0" style="max-width:620px;width:100%;">
+
+  <!-- HEADER -->
+  <tr><td style="background:linear-gradient(135deg,#0ea5e9 0%,#6366f1 100%);border-radius:18px 18px 0 0;padding:40px 36px;text-align:center;">
+    <div style="width:68px;height:68px;background:rgba(255,255,255,.2);border-radius:50%;display:inline-block;line-height:68px;font-size:32px;margin-bottom:16px;">&#10003;</div>
+    <h1 style="color:#fff;font-size:28px;font-weight:900;margin:0 0 8px;letter-spacing:-0.5px;">Booking Confirmed!</h1>
+    <p style="color:rgba(255,255,255,.88);font-size:15px;margin:0 0 20px;">Your adventure is officially booked. Get ready to explore!</p>
+    <div style="display:inline-block;background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.5);padding:9px 28px;border-radius:30px;color:#fff;font-size:13px;font-weight:800;letter-spacing:2px;">
+      BOOKING ID: {{ booking.booking_id }}
+    </div>
+  </td></tr>
+
+  <!-- BODY -->
+  <tr><td style="background:#fff;padding:32px 36px;">
+
+    <!-- Greeting -->
+    <p style="font-size:15px;color:#334155;line-height:1.8;margin:0 0 28px;">
+      Hi <strong style="color:#0f172a;">{{ user.get_full_name|default:user.username }}</strong>,<br>
+      Thank you for choosing <strong style="color:#0ea5e9;">TravelVibe</strong>! Your booking is confirmed and we're thrilled to be part of your journey. Here are all your trip details:
+    </p>
+
+    <!-- Package Details -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+      <tr><td style="padding-bottom:10px;border-bottom:2px solid #e0f2fe;">
+        <span style="font-size:11px;font-weight:800;color:#0ea5e9;text-transform:uppercase;letter-spacing:1.5px;">Trip Details</span>
+      </td></tr>
+      <tr><td style="padding:12px 0 0;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr style="background:#f8fafc;"><td style="color:#64748b;font-size:13.5px;padding:9px 12px;width:40%;">Package</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ package.title }}</td></tr>
+          <tr><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Destination</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ package.destination.name }}, {{ package.destination.country }}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Duration</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ package.duration }} Days</td></tr>
+          <tr><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Travel Date</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ booking.travel_date }}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Travelers</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ booking.adults_count }} Adult(s){% if booking.children_count %}, {{ booking.children_count }} Child(ren){% endif %}</td></tr>
+          <tr><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Seat Class</td><td style="color:#0f172a;font-weight:700;font-size:13.5px;padding:9px 12px;">{{ booking.seat_class }}</td></tr>
+        </table>
+      </td></tr>
+    </table>
+
+    <!-- Traveler Details -->
+    {% if travelers %}
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+      <tr><td style="padding-bottom:10px;border-bottom:2px solid #e0f2fe;">
+        <span style="font-size:11px;font-weight:800;color:#0ea5e9;text-transform:uppercase;letter-spacing:1.5px;">Traveler Details</span>
+      </td></tr>
+      <tr><td style="padding-top:12px;">
+        {% for t in travelers %}
+        <span style="display:inline-block;background:#e0f2fe;color:#0369a1;padding:6px 16px;border-radius:20px;font-size:12.5px;font-weight:600;margin:3px 3px 3px 0;">{{ t.name }} | {{ t.age }} yrs | {{ t.get_gender_display }}</span>
+        {% endfor %}
+      </td></tr>
+    </table>
+    {% endif %}
+
+    <!-- FLIGHT TICKETS -->
+    {% if booking.outbound_airline or booking.return_airline %}
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+      <tr><td style="padding-bottom:14px;border-bottom:2px solid #e0f2fe;">
+        <span style="font-size:11px;font-weight:800;color:#0ea5e9;text-transform:uppercase;letter-spacing:1.5px;">Your Flight Tickets</span>
+      </td></tr>
+      <tr><td style="padding-top:16px;">
+
+        <!-- OUTBOUND TICKET -->
+        {% if booking.outbound_airline %}
+        <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;border-radius:14px;overflow:hidden;border:1.5px solid #bae6fd;">
+          <!-- Ticket Header -->
+          <tr><td style="background:linear-gradient(90deg,#0ea5e9,#38bdf8);padding:12px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="color:#fff;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;">Outbound Flight</td>
+                <td align="right" style="color:rgba(255,255,255,.9);font-size:12px;font-weight:700;">{{ booking.outbound_airline }}</td>
+              </tr>
+            </table>
+          </td></tr>
+          <!-- Route Bar -->
+          <tr><td style="background:#fff;padding:20px 20px 16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr valign="middle">
+                <td style="text-align:left;width:35%;">
+                  <div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-1px;">{{ booking.outbound_from }}</div>
+                  <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ booking.outbound_departure }}</div>
+                </td>
+                <td style="text-align:center;width:30%;">
+                  <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">{{ booking.outbound_duration }}</div>
+                  <div style="border-top:2px dashed #cbd5e1;position:relative;">
+                    <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:16px;">&#9992;</span>
+                  </div>
+                  <div style="font-size:10px;color:#94a3b8;margin-top:6px;">{{ booking.outbound_stops }}</div>
+                </td>
+                <td style="text-align:right;width:35%;">
+                  <div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-1px;">{{ booking.outbound_to }}</div>
+                  <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ booking.outbound_arrival }}</div>
+                </td>
+              </tr>
+            </table>
+          </td></tr>
+          <!-- Ticket Footer -->
+          <tr><td style="background:#f0f9ff;border-top:1.5px dashed #bae6fd;padding:10px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size:12px;color:#475569;">Flight No: <strong style="color:#0f172a;">{{ booking.outbound_flight_no }}</strong></td>
+                <td align="center" style="font-size:12px;color:#475569;">Class: <strong style="color:#0f172a;">{{ booking.seat_class }}</strong></td>
+                <td align="right" style="font-size:12px;color:#475569;">Pax: <strong style="color:#0f172a;">{{ booking.adults_count }}{% if booking.children_count %}+{{ booking.children_count }}{% endif %}</strong></td>
+              </tr>
+            </table>
+          </td></tr>
+        </table>
+        {% endif %}
+
+        <!-- RETURN TICKET -->
+        {% if booking.return_airline %}
+        <table width="100%" cellpadding="0" cellspacing="0" style="border-radius:14px;overflow:hidden;border:1.5px solid #c7d2fe;">
+          <!-- Ticket Header -->
+          <tr><td style="background:linear-gradient(90deg,#6366f1,#818cf8);padding:12px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="color:#fff;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;">Return Flight</td>
+                <td align="right" style="color:rgba(255,255,255,.9);font-size:12px;font-weight:700;">{{ booking.return_airline }}</td>
+              </tr>
+            </table>
+          </td></tr>
+          <!-- Route Bar -->
+          <tr><td style="background:#fff;padding:20px 20px 16px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr valign="middle">
+                <td style="text-align:left;width:35%;">
+                  <div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-1px;">{{ booking.return_from }}</div>
+                  <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ booking.return_departure }}</div>
+                </td>
+                <td style="text-align:center;width:30%;">
+                  <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;">{{ booking.return_duration }}</div>
+                  <div style="border-top:2px dashed #cbd5e1;position:relative;">
+                    <span style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-size:16px;">&#9992;</span>
+                  </div>
+                  <div style="font-size:10px;color:#94a3b8;margin-top:6px;">{{ booking.return_stops }}</div>
+                </td>
+                <td style="text-align:right;width:35%;">
+                  <div style="font-size:26px;font-weight:900;color:#0f172a;letter-spacing:-1px;">{{ booking.return_to }}</div>
+                  <div style="font-size:12px;color:#64748b;margin-top:2px;">{{ booking.return_arrival }}</div>
+                </td>
+              </tr>
+            </table>
+          </td></tr>
+          <!-- Ticket Footer -->
+          <tr><td style="background:#f5f3ff;border-top:1.5px dashed #c7d2fe;padding:10px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="font-size:12px;color:#475569;">Flight No: <strong style="color:#0f172a;">{{ booking.return_flight_no }}</strong></td>
+                <td align="center" style="font-size:12px;color:#475569;">Class: <strong style="color:#0f172a;">{{ booking.seat_class }}</strong></td>
+                <td align="right" style="font-size:12px;color:#475569;">Pax: <strong style="color:#0f172a;">{{ booking.adults_count }}{% if booking.children_count %}+{{ booking.children_count }}{% endif %}</strong></td>
+              </tr>
+            </table>
+          </td></tr>
+        </table>
+        {% endif %}
+
+      </td></tr>
+    </table>
+    {% endif %}
+
+    <!-- Payment Summary -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+      <tr><td style="padding-bottom:10px;border-bottom:2px solid #e0f2fe;">
+        <span style="font-size:11px;font-weight:800;color:#0ea5e9;text-transform:uppercase;letter-spacing:1.5px;">Payment Summary</span>
+      </td></tr>
+      <tr><td style="padding-top:10px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr style="background:#f8fafc;"><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Base Fare</td><td align="right" style="color:#0f172a;font-weight:600;font-size:13.5px;padding:9px 12px;">&#8377;{{ booking.base_fare }}</td></tr>
+          <tr><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Taxes &amp; Fees (9%)</td><td align="right" style="color:#0f172a;font-weight:600;font-size:13.5px;padding:9px 12px;">&#8377;{{ booking.tax_amount }}</td></tr>
+          {% if booking.discount_amount %}
+          <tr style="background:#f8fafc;"><td style="color:#64748b;font-size:13.5px;padding:9px 12px;">Discount</td><td align="right" style="color:#10b981;font-weight:600;font-size:13.5px;padding:9px 12px;">- &#8377;{{ booking.discount_amount }}</td></tr>
+          {% endif %}
+          <tr style="border-top:2px solid #e0f2fe;"><td style="color:#0f172a;font-size:15px;font-weight:800;padding:12px 12px;">Total Amount</td><td align="right" style="color:#0ea5e9;font-size:18px;font-weight:900;padding:12px 12px;">&#8377;{{ booking.total_amount }}</td></tr>
+          <tr style="background:#f0fdf4;"><td style="color:#15803d;font-size:13.5px;font-weight:600;padding:9px 12px;">Amount Paid</td><td align="right" style="padding:9px 12px;"><span style="background:#dcfce7;color:#15803d;padding:4px 14px;border-radius:20px;font-size:12.5px;font-weight:700;">&#8377;{{ booking.amount_paid }} PAID</span></td></tr>
+          {% if booking.remaining_amount and booking.remaining_amount > 0 %}
+          <tr><td style="color:#b45309;font-size:13.5px;font-weight:600;padding:9px 12px;">Remaining Balance</td><td align="right" style="padding:9px 12px;"><span style="background:#fef3c7;color:#b45309;padding:4px 14px;border-radius:20px;font-size:12.5px;font-weight:700;">&#8377;{{ booking.remaining_amount }} DUE{% if booking.remaining_due_date %} by {{ booking.remaining_due_date }}{% endif %}</span></td></tr>
+          {% endif %}
+        </table>
+      </td></tr>
+    </table>
+
+    <!-- Important Note -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+      <tr><td style="background:#fefce8;border:1px solid #fde68a;border-radius:12px;padding:16px 18px;">
+        <p style="font-size:13px;color:#92400e;line-height:1.7;margin:0;">
+          <strong style="color:#78350f;">Important:</strong> Please carry a valid government-issued photo ID and this booking confirmation when you travel. For changes or cancellations, contact us at least 48 hours before your travel date.
+        </p>
+      </td></tr>
+    </table>
+
+  </td></tr>
+
+  <!-- FOOTER -->
+  <tr><td style="background:#f8fafc;border-radius:0 0 18px 18px;padding:24px 36px;text-align:center;border-top:1px solid #e2e8f0;">
+    <p style="font-size:13px;color:#64748b;margin:0 0 6px;">Questions? Email us at <a href="mailto:support@travelvibe.com" style="color:#0ea5e9;font-weight:600;text-decoration:none;">support@travelvibe.com</a></p>
+    <p style="font-size:12px;color:#94a3b8;margin:0;">&copy; 2026 TravelVibe &mdash; Have an amazing trip!</p>
+  </td></tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>

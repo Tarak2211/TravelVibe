@@ -1,0 +1,386 @@
+{% extends 'store/base.html' %}
+
+{% block title %}Destinations - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+    
+    .page-header h1 {
+        font-size: 2.2rem;
+        font-weight: 900;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    
+    .page-header p {
+        font-size: 1rem;
+        opacity: 0.95;
+    }
+    
+    .destinations-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+    }
+    
+    .destinations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .destination-card {
+        background: white;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        transition: all 0.4s ease;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        position: relative;
+    }
+    
+    .destination-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0ea5e9 0%, #06b6d4 100%);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+    
+    .destination-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .destination-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 50px rgba(14, 165, 233, 0.25);
+        border-color: rgba(14, 165, 233, 0.4);
+    }
+    
+    .destination-image {
+        width: 100%;
+        height: 170px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        transition: transform 0.4s ease;
+    }
+    
+    .destination-card:hover .destination-image {
+        transform: scale(1.08);
+    }
+    
+    /* STUNNING Real destination images - CORRECTLY MATCHED */
+    .destination-goa .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-bali .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-manali .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-paris .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-dubai .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-maldives .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-kerala .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-jaipur .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1599661046289-e31897846e41?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-thailand .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-switzerland .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1527668752968-14dc70a27c95?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-singapore .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-shimla .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-udaipur .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                    url('https://images.unsplash.com/photo-1609920658906-8223bd289001?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-rishikesh .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1626621341912-ab7c2cb44a49?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-andaman .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-lehladakh .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-ooty .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-darjeeling .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-varanasi .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-agra .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1564507592333-c60657eea523?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-coorg .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-mysore .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-malaysia .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-vietnam .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1528127269322-539801943592?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-turkey .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-greece .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-italy .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-spain .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-australia .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-newzealand .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-japan .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-southkorea .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-mauritius .destination-image {
+        background: linear-gradient(rgba(0,0,0,0.15), rgba(0,0,0,0.15)), 
+                    url('https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1200&q=90');
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .destination-content {
+        padding: 1.1rem;
+    }
+    
+    .destination-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.4rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+    
+    .destination-country {
+        color: #0ea5e9;
+        font-weight: 600;
+        margin-bottom: 0.6rem;
+        font-size: 0.9rem;
+    }
+    
+    .destination-description {
+        color: #64748b;
+        line-height: 1.6;
+        font-size: 0.85rem;
+    }
+    
+    .explore-btn {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 0.6rem 1.4rem;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+        font-size: 0.85rem;
+    }
+    
+    .explore-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(14, 165, 233, 0.6);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>🌍 Explore Destinations</h1>
+    <p>Discover amazing places around the world</p>
+</section>
+
+<section class="destinations-container">
+    <div class="destinations-grid">
+        {% for destination in destinations %}
+        <div class="destination-card destination-{{ destination.name|lower|cut:' '|cut:',' }}">
+            {% if destination.image %}
+            <img src="{{ destination.image.url }}" alt="{{ destination.name }}" class="destination-image">
+            {% else %}
+            <div class="destination-image"></div>
+            {% endif %}
+            <div class="destination-content">
+                <h3 class="destination-title">{{ destination.name }}</h3>
+                <p class="destination-country">📍 {{ destination.country }}</p>
+                <p class="destination-description">{{ destination.description }}</p>
+                <a href="{% url 'packages' %}?destination={{ destination.name }}" class="explore-btn">Explore Packages →</a>
+            </div>
+        </div>
+        {% empty %}
+        <p>No destinations available at the moment.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,654 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+{% load package_filters %}
+
+{% block title %}{{ package.title }} - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: #f8fafc;
+    }
+    
+    /* Hero Section with Image Gallery */
+    .package-hero {
+        position: relative;
+        height: 450px;
+        background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
+                    url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=90');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        display: flex;
+        align-items: flex-end;
+        padding: 3rem;
+    }
+    
+    .hero-content {
+        max-width: 1400px;
+        width: 100%;
+        margin: 0 auto;
+    }
+    
+    .category-badge {
+        display: inline-block;
+        padding: 0.5rem 1.2rem;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .hero-content h1 {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 0.8rem;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    
+    .hero-location {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Main Container */
+    .detail-wrapper {
+        max-width: 1400px;
+        margin: -50px auto 0;
+        padding: 0 2rem 4rem;
+        position: relative;
+        z-index: 10;
+    }
+    
+    /* Top Info Bar */
+    .info-bar {
+        background: white;
+        padding: 1.5rem 2rem;
+        border-radius: 15px 15px 0 0;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .info-icon {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+    }
+    
+    .info-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .info-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+    
+    .info-value {
+        font-size: 1.1rem;
+        color: #1e293b;
+        font-weight: 700;
+    }
+    
+    /* Main Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 380px;
+        gap: 2rem;
+        margin-top: 0;
+    }
+    
+    /* Left Column - Itinerary */
+    .itinerary-section {
+        background: white;
+        border-radius: 0 0 20px 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+    
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 3px solid #667eea;
+    }
+    
+    .section-header h2 {
+        font-size: 2rem;
+        color: #1e293b;
+        font-weight: 800;
+    }
+    
+    /* Day Timeline */
+    .itinerary-timeline {
+        position: relative;
+        padding-left: 3rem;
+    }
+    
+    .itinerary-timeline::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .day-item {
+        position: relative;
+        margin-bottom: 3rem;
+        padding-left: 2rem;
+    }
+    
+    .day-marker {
+        position: absolute;
+        left: -2.8rem;
+        top: 0;
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 0.9rem;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        z-index: 2;
+    }
+    
+    .day-header {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .day-title {
+        font-size: 1.5rem;
+        color: #667eea;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+    }
+    
+    .day-subtitle {
+        color: #64748b;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    
+    /* Flight/Train Cards */
+    .transport-card {
+        background: white;
+        border: 2px solid #e0e7ff;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 2rem;
+        align-items: center;
+    }
+    
+    .transport-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .transport-details {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+    
+    .transport-time {
+        text-align: center;
+    }
+    
+    .time-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1e293b;
+    }
+    
+    .time-label {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.3rem;
+    }
+    
+    .transport-arrow {
+        color: #667eea;
+        font-size: 1.5rem;
+    }
+    
+    .transport-price {
+        text-align: right;
+    }
+    
+    .price-value {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #10b981;
+    }
+    
+    .price-label {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-top: 0.3rem;
+    }
+    
+    /* Activity Cards */
+    .activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .activity-item {
+        background: #f8fafc;
+        padding: 1.2rem;
+        border-radius: 12px;
+        border-left: 4px solid #10b981;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .activity-icon {
+        font-size: 1.5rem;
+    }
+    
+    .activity-text {
+        flex: 1;
+        color: #475569;
+        line-height: 1.6;
+    }
+    
+    .activity-cost {
+        font-weight: 700;
+        color: #667eea;
+        white-space: nowrap;
+    }
+    
+    /* Right Sidebar - Pricing */
+    .sidebar {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+    
+    .price-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2.5rem;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .price-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .price-main {
+        font-size: 3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 900;
+        line-height: 1;
+    }
+    
+    .price-subtitle {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    .pricing-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .pricing-option {
+        background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+        padding: 1.2rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .pricing-option:hover {
+        border-color: #667eea;
+        transform: translateX(5px);
+    }
+    
+    .option-label {
+        font-weight: 700;
+        color: #475569;
+        font-size: 0.95rem;
+    }
+    
+    .option-price {
+        font-size: 1.3rem;
+        font-weight: 800;
+        color: #667eea;
+    }
+    
+    .emi-card {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .emi-badge {
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .emi-amount {
+        font-size: 2rem;
+        font-weight: 900;
+        margin-top: 0.5rem;
+    }
+    
+    .book-button {
+        display: block;
+        width: 100%;
+        padding: 1.3rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-align: center;
+        border-radius: 15px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .book-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
+    }
+    
+    /* Inclusions/Exclusions */
+    .inclusions-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-top: 2rem;
+    }
+    
+    .inclusions-grid {
+        display: grid;
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+    }
+    
+    .inclusion-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 10px;
+        border-left: 4px solid #10b981;
+    }
+    
+    .inclusion-icon {
+        color: #10b981;
+        font-size: 1.3rem;
+    }
+    
+    .exclusion-item {
+        border-left-color: #ef4444;
+    }
+    
+    .exclusion-icon {
+        color: #ef4444;
+    }
+    
+    /* Responsive */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="package-hero">
+    <div class="hero-content">
+        <span class="category-badge">{{ package.get_category_display }} PACKAGE</span>
+        <h1>{{ package.title }}</h1>
+        <p class="hero-location">
+            <span>📍</span>
+            <span>{{ package.destination.name }}, {{ package.destination.country }}</span>
+        </p>
+    </div>
+</section>
+
+<div class="detail-wrapper">
+    <!-- Info Bar -->
+    <div class="info-bar">
+        <div class="info-item">
+            <div class="info-icon">⏱️</div>
+            <div class="info-text">
+                <span class="info-label">Duration</span>
+                <span class="info-value">{{ package.get_duration_display }}</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">✈️</div>
+            <div class="info-text">
+                <span class="info-label">Flights Included</span>
+                <span class="info-value">Round Trip</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">🏨</div>
+            <div class="info-text">
+                <span class="info-label">Hotels</span>
+                <span class="info-value">4-Star Premium</span>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-icon">🍽️</div>
+            <div class="info-text">
+                <span class="info-label">Meals</span>
+                <span class="info-value">All Included</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="content-grid">
+        <!-- Left Column - Itinerary -->
+        <div class="itinerary-section">
+            <div class="section-header">
+                <span style="font-size: 2.5rem;">🗓️</span>
+                <h2>Complete Day-by-Day Itinerary</h2>
+            </div>
+
+            <div class="itinerary-timeline">
+                {% for day_text in package.itinerary|split_days %}
+                <div class="day-item">
+                    <div class="day-marker">{{ forloop.counter }}</div>
+                    <div class="day-header">
+                        <h3 class="day-title">Day {{ forloop.counter }}</h3>
+                        <p class="day-subtitle">{{ day_text|get_day_title }}</p>
+                    </div>
+                    
+                    <div class="day-content">
+                        {{ day_text|format_day_content|safe }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Inclusions -->
+            <div class="inclusions-card" style="margin-top: 3rem;">
+                <div class="section-header">
+                    <span style="font-size: 2rem;">✅</span>
+                    <h2>What's Included</h2>
+                </div>
+                <div class="inclusions-grid">
+                    {% for inclusion in package.get_inclusions_list %}
+                    <div class="inclusion-item">
+                        <span class="inclusion-icon">✓</span>
+                        <span>{{ inclusion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Exclusions -->
+            <div class="inclusions-card">
+                <div class="section-header">
+                    <span style="font-size: 2rem;">❌</span>
+                    <h2>What's Not Included</h2>
+                </div>
+                <div class="inclusions-grid">
+                    {% for exclusion in package.get_exclusions_list %}
+                    <div class="inclusion-item exclusion-item">
+                        <span class="exclusion-icon">✗</span>
+                        <span>{{ exclusion }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Pricing -->
+        <div class="sidebar">
+            <div class="price-card">
+                <div class="price-header">
+                    <div class="price-main">₹{{ package.price_per_person|floatformat:0|intcomma }}</div>
+                    <p class="price-subtitle">Starting price per person</p>
+                </div>
+
+                <div class="pricing-options">
+                    <div class="pricing-option">
+                        <span class="option-label">👤 Per Person</span>
+                        <span class="option-price">₹{{ package.price_per_person|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="pricing-option">
+                        <span class="option-label">💑 For Couple</span>
+                        <span class="option-price">₹{{ package.price_per_couple|floatformat:0|intcomma }}</span>
+                    </div>
+                    <div class="pricing-option">
+                        <span class="option-label">👨‍👩‍👧‍👦 Group (4+)</span>
+                        <span class="option-price">₹{{ package.price_per_group|floatformat:0|intcomma }}</span>
+                    </div>
+                </div>
+
+                {% if package.emi_available %}
+                <div class="emi-card">
+                    <div class="emi-badge">🎉 No Cost EMI Available</div>
+                    <div>Starting at</div>
+                    <div class="emi-amount">₹{{ package.emi_per_month|floatformat:0|intcomma }}/month</div>
+                </div>
+                {% endif %}
+
+                <button class="book-button">Book Now →</button>
+            </div>
+
+            <!-- Quick Info -->
+            <div class="price-card">
+                <h3 style="font-size: 1.3rem; margin-bottom: 1.5rem; color: #1e293b; font-weight: 800;">📋 Package Details</h3>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Category</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.get_category_display }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Destination</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.destination.name }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0; border-bottom: 1px solid #e2e8f0;">
+                        <span style="color: #64748b;">Available From</span>
+                        <span style="color: #1e293b; font-weight: 700;">{{ package.available_from|date:"d M Y" }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 0.8rem 0;">
+                        <span style="color: #64748b;">Popularity</span>
+                        <span style="color: #1e293b; font-weight: 700;">⭐ {{ package.popularity_score }}/100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

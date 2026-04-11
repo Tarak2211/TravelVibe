@@ -1,0 +1,497 @@
+<!-- ADD THIS CSS TO THE <style> SECTION IN package_detail.html -->
+<style>
+/* Flight Selection Section */
+.flight-selection-wrapper {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+}
+
+.flight-section-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 3px solid #0ea5e9;
+}
+
+.flight-section-header h2 {
+    font-size: 1.8rem;
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.flight-direction-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.flight-tab {
+    flex: 1;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.flight-tab.active {
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    border-color: #0ea5e9;
+    color: white;
+}
+
+.flight-options-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.flight-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.flight-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.15);
+    transform: translateY(-2px);
+}
+
+.flight-card.selected {
+    border-color: #0ea5e9;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.2);
+}
+
+.flight-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.airline-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.airline-logo {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.airline-details h4 {
+    font-size: 1.1rem;
+    color: #1e293b;
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+}
+
+.airline-details p {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.flight-badge {
+    padding: 0.4rem 0.9rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.flight-route {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding: 1.2rem;
+    background: white;
+    border-radius: 12px;
+}
+
+.route-point {
+    text-align: center;
+}
+
+.route-time {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+}
+
+.route-location {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.route-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arrow-icon {
+    color: #0ea5e9;
+    font-size: 1.5rem;
+}
+
+.flight-duration {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.seat-class-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.seat-class-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.seat-class-card:hover {
+    border-color: #0ea5e9;
+    transform: scale(1.02);
+}
+
+.seat-class-card.selected {
+    border-color: #0ea5e9;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.seat-class-card input[type="radio"] {
+    display: none;
+}
+
+.class-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.class-price {
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.class-features {
+    margin-top: 0.8rem;
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.selected-flight-summary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+    display: none;
+}
+
+.selected-flight-summary.show {
+    display: block;
+}
+
+.summary-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.summary-text h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.summary-text p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.summary-price {
+    text-align: right;
+}
+
+.total-price {
+    font-size: 2rem;
+    font-weight: 900;
+}
+
+.price-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+</style>
+
+<!-- ADD THIS HTML SECTION AFTER THE INFO BAR AND BEFORE THE ITINERARY SECTION -->
+<div class="flight-selection-wrapper">
+    <div class="flight-section-header">
+        <span style="font-size: 2rem;">✈️</span>
+        <h2>Select Your Flights</h2>
+    </div>
+
+    <!-- Flight Direction Tabs -->
+    <div class="flight-direction-tabs">
+        <div class="flight-tab active" onclick="showFlights('outbound')">
+            🛫 Outbound Flight
+        </div>
+        <div class="flight-tab" onclick="showFlights('return')">
+            🛬 Return Flight
+        </div>
+    </div>
+
+    <!-- Outbound Flights -->
+    <div id="outbound-flights" class="flight-options-grid">
+        {% for flight in flights.outbound %}
+        <div class="flight-card" onclick="selectFlight('outbound', {{ forloop.counter0 }})">
+            <div class="flight-card-header">
+                <div class="airline-info">
+                    <div class="airline-logo">
+                        {{ flight.airline|slice:":2"|upper }}
+                    </div>
+                    <div class="airline-details">
+                        <h4>{{ flight.airline }}</h4>
+                        <p>{{ flight.flight_no }}</p>
+                    </div>
+                </div>
+                <div class="flight-badge">{{ flight.stops }}</div>
+            </div>
+
+            <div class="flight-route">
+                <div class="route-point">
+                    <div class="route-time">{{ flight.departure }}</div>
+                    <div class="route-location">{{ flight.from }}</div>
+                </div>
+                <div class="route-arrow">
+                    <span class="arrow-icon">→</span>
+                    <span class="flight-duration">{{ flight.duration }}</span>
+                </div>
+                <div class="route-point">
+                    <div class="route-time">{{ flight.arrival }}</div>
+                    <div class="route-location">{{ flight.to }}</div>
+                </div>
+            </div>
+
+            <div class="seat-class-options">
+                <label class="seat-class-card">
+                    <input type="radio" name="outbound-class-{{ forloop.counter0 }}" value="economy" data-price="{{ flight.economy }}">
+                    <div class="class-name">Economy</div>
+                    <div class="class-price">₹{{ flight.economy|floatformat:0 }}</div>
+                    <div class="class-features">✓ 15kg Baggage<br>✓ Meals</div>
+                </label>
+                <label class="seat-class-card">
+                    <input type="radio" name="outbound-class-{{ forloop.counter0 }}" value="premium" data-price="{{ flight.premium }}">
+                    <div class="class-name">Premium</div>
+                    <div class="class-price">₹{{ flight.premium|floatformat:0 }}</div>
+                    <div class="class-features">✓ 25kg Baggage<br>✓ Priority</div>
+                </label>
+                <label class="seat-class-card">
+                    <input type="radio" name="outbound-class-{{ forloop.counter0 }}" value="business" data-price="{{ flight.business }}">
+                    <div class="class-name">Business</div>
+                    <div class="class-price">₹{{ flight.business|floatformat:0 }}</div>
+                    <div class="class-features">✓ 40kg Baggage<br>✓ Lounge</div>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Return Flights -->
+    <div id="return-flights" class="flight-options-grid" style="display: none;">
+        {% for flight in flights.return %}
+        <div class="flight-card" onclick="selectFlight('return', {{ forloop.counter0 }})">
+            <div class="flight-card-header">
+                <div class="airline-info">
+                    <div class="airline-logo">
+                        {{ flight.airline|slice:":2"|upper }}
+                    </div>
+                    <div class="airline-details">
+                        <h4>{{ flight.airline }}</h4>
+                        <p>{{ flight.flight_no }}</p>
+                    </div>
+                </div>
+                <div class="flight-badge">{{ flight.stops }}</div>
+            </div>
+
+            <div class="flight-route">
+                <div class="route-point">
+                    <div class="route-time">{{ flight.departure }}</div>
+                    <div class="route-location">{{ flight.from }}</div>
+                </div>
+                <div class="route-arrow">
+                    <span class="arrow-icon">→</span>
+                    <span class="flight-duration">{{ flight.duration }}</span>
+                </div>
+                <div class="route-point">
+                    <div class="route-time">{{ flight.arrival }}</div>
+                    <div class="route-location">{{ flight.to }}</div>
+                </div>
+            </div>
+
+            <div class="seat-class-options">
+                <label class="seat-class-card">
+                    <input type="radio" name="return-class-{{ forloop.counter0 }}" value="economy" data-price="{{ flight.economy }}">
+                    <div class="class-name">Economy</div>
+                    <div class="class-price">₹{{ flight.economy|floatformat:0 }}</div>
+                    <div class="class-features">✓ 15kg Baggage<br>✓ Meals</div>
+                </label>
+                <label class="seat-class-card">
+                    <input type="radio" name="return-class-{{ forloop.counter0 }}" value="premium" data-price="{{ flight.premium }}">
+                    <div class="class-name">Premium</div>
+                    <div class="class-price">₹{{ flight.premium|floatformat:0 }}</div>
+                    <div class="class-features">✓ 25kg Baggage<br>✓ Priority</div>
+                </label>
+                <label class="seat-class-card">
+                    <input type="radio" name="return-class-{{ forloop.counter0 }}" value="business" data-price="{{ flight.business }}">
+                    <div class="class-name">Business</div>
+                    <div class="class-price">₹{{ flight.business|floatformat:0 }}</div>
+                    <div class="class-features">✓ 40kg Baggage<br>✓ Lounge</div>
+                </label>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Selected Flight Summary -->
+    <div id="flight-summary" class="selected-flight-summary">
+        <div class="summary-content">
+            <div class="summary-text">
+                <h3>✓ Flights Selected</h3>
+                <p id="summary-details">Select your outbound and return flights</p>
+            </div>
+            <div class="summary-price">
+                <div class="total-price" id="total-flight-price">₹0</div>
+                <div class="price-label">Total Flight Cost</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ADD THIS JAVASCRIPT AT THE END OF THE TEMPLATE -->
+<script>
+let selectedFlights = {
+    outbound: null,
+    return: null
+};
+
+function showFlights(direction) {
+    // Update tabs
+    document.querySelectorAll('.flight-tab').forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Show/hide flight sections
+    document.getElementById('outbound-flights').style.display = direction === 'outbound' ? 'grid' : 'none';
+    document.getElementById('return-flights').style.display = direction === 'return' ? 'grid' : 'none';
+}
+
+function selectFlight(direction, index) {
+    // Remove previous selection
+    document.querySelectorAll(`#${direction}-flights .flight-card`).forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selection to clicked card
+    event.currentTarget.classList.add('selected');
+    
+    // Store selection
+    selectedFlights[direction] = index;
+    
+    updateSummary();
+}
+
+// Handle seat class selection
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.seat-class-card').forEach(card => {
+        card.addEventListener('click', function() {
+            // Remove selected from siblings
+            this.parentElement.querySelectorAll('.seat-class-card').forEach(c => c.classList.remove('selected'));
+            // Add selected to this card
+            this.classList.add('selected');
+            // Check the radio button
+            this.querySelector('input[type="radio"]').checked = true;
+            
+            updateSummary();
+        });
+    });
+});
+
+function updateSummary() {
+    let totalPrice = 0;
+    let outboundSelected = false;
+    let returnSelected = false;
+    
+    // Calculate outbound price
+    const outboundChecked = document.querySelector('#outbound-flights input[type="radio"]:checked');
+    if (outboundChecked) {
+        totalPrice += parseInt(outboundChecked.dataset.price);
+        outboundSelected = true;
+    }
+    
+    // Calculate return price
+    const returnChecked = document.querySelector('#return-flights input[type="radio"]:checked');
+    if (returnChecked) {
+        totalPrice += parseInt(returnChecked.dataset.price);
+        returnSelected = true;
+    }
+    
+    // Update summary
+    if (outboundSelected || returnSelected) {
+        document.getElementById('flight-summary').classList.add('show');
+        document.getElementById('total-flight-price').textContent = '₹' + totalPrice.toLocaleString('en-IN');
+        
+        let details = '';
+        if (outboundSelected && returnSelected) {
+            details = 'Round trip flights selected';
+        } else if (outboundSelected) {
+            details = 'Outbound flight selected - Select return flight';
+        } else {
+            details = 'Return flight selected - Select outbound flight';
+        }
+        document.getElementById('summary-details').textContent = details;
+    }
+}
+</script>

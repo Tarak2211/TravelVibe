@@ -1,0 +1,655 @@
+<!-- ADD THIS CSS TO THE <style> SECTION IN package_detail.html -->
+<style>
+/* Flight Booking Modal */
+.flight-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.flight-modal.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 24px;
+    max-width: 1200px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 24px 24px 0 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.modal-header h2 {
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+}
+
+.modal-header p {
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.flight-step {
+    margin-bottom: 3rem;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-number {
+    width: 45px;
+    height: 45px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 1.3rem;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.flight-options-list {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.flight-option-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border: 3px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.flight-option-card:hover {
+    border-color: #0ea5e9;
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.2);
+    transform: translateY(-3px);
+}
+
+.flight-option-card.selected {
+    border-color: #0ea5e9;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.25);
+}
+
+.flight-main-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.airline-section {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.airline-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+}
+
+.airline-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.3rem;
+}
+
+.flight-number {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.direct-badge {
+    padding: 0.5rem 1.2rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.flight-timing {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 14px;
+    margin-bottom: 1.5rem;
+}
+
+.timing-point {
+    text-align: center;
+}
+
+.time-large {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.location-text {
+    font-size: 0.95rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.timing-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.plane-icon {
+    font-size: 2rem;
+    color: #0ea5e9;
+}
+
+.duration-text {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.seat-classes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.class-option {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.3rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.class-option:hover {
+    border-color: #0ea5e9;
+    transform: scale(1.03);
+}
+
+.class-option.selected {
+    border-color: #0ea5e9;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.class-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.class-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.class-price-large {
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.8rem;
+}
+
+.class-benefits {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.class-benefits div {
+    margin: 0.3rem 0;
+}
+
+.modal-footer {
+    background: #f8fafc;
+    padding: 2rem;
+    border-radius: 0 0 24px 24px;
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2px solid #e2e8f0;
+}
+
+.price-summary {
+    flex: 1;
+}
+
+.price-breakdown {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.total-amount {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.confirm-booking-btn {
+    padding: 1.3rem 3rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.confirm-booking-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.6);
+}
+
+.confirm-booking-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.selection-indicator {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 1rem;
+}
+</style>
+
+<!-- REPLACE THE EXISTING BOOK BUTTON WITH THIS -->
+<button class="book-button" onclick="openFlightModal()">BOOK NOW →</button>
+
+<!-- ADD THIS MODAL HTML AT THE END OF THE TEMPLATE, BEFORE {% endblock %} -->
+<div id="flightModal" class="flight-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>✈️ Select Your Flights</h2>
+            <p>Choose your preferred flights and seat class for {{ package.destination.name }}</p>
+            <button class="modal-close" onclick="closeFlightModal()">×</button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Step 1: Outbound Flight -->
+            <div class="flight-step">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">🛫 Select Outbound Flight</div>
+                    <span id="outbound-selected" class="selection-indicator" style="display: none;">✓ Selected</span>
+                </div>
+
+                <div class="flight-options-list">
+                    {% for flight in flights.outbound %}
+                    <div class="flight-option-card" data-flight-index="{{ forloop.counter0 }}" data-direction="outbound">
+                        <div class="flight-main-info">
+                            <div class="airline-section">
+                                <div class="airline-icon">{{ flight.airline|slice:":2"|upper }}</div>
+                                <div>
+                                    <div class="airline-name">{{ flight.airline }}</div>
+                                    <div class="flight-number">{{ flight.flight_no }}</div>
+                                </div>
+                            </div>
+                            <div class="direct-badge">{{ flight.stops }}</div>
+                        </div>
+
+                        <div class="flight-timing">
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.departure }}</div>
+                                <div class="location-text">{{ flight.from }}</div>
+                            </div>
+                            <div class="timing-divider">
+                                <div class="plane-icon">✈</div>
+                                <div class="duration-text">{{ flight.duration }}</div>
+                            </div>
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.arrival }}</div>
+                                <div class="location-text">{{ flight.to }}</div>
+                            </div>
+                        </div>
+
+                        <div class="seat-classes">
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="economy-{{ forloop.counter0 }}" data-price="{{ flight.economy }}" data-class="Economy">
+                                <div class="class-label">💺 Economy</div>
+                                <div class="class-price-large">₹{{ flight.economy|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 15kg Check-in Baggage</div>
+                                    <div>✓ 7kg Cabin Baggage</div>
+                                    <div>✓ Complimentary Meals</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="premium-{{ forloop.counter0 }}" data-price="{{ flight.premium }}" data-class="Premium Economy">
+                                <div class="class-label">⭐ Premium</div>
+                                <div class="class-price-large">₹{{ flight.premium|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 25kg Check-in Baggage</div>
+                                    <div>✓ 10kg Cabin Baggage</div>
+                                    <div>✓ Priority Boarding</div>
+                                    <div>✓ Extra Legroom</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="outbound-class" value="business-{{ forloop.counter0 }}" data-price="{{ flight.business }}" data-class="Business Class">
+                                <div class="class-label">👔 Business</div>
+                                <div class="class-price-large">₹{{ flight.business|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 40kg Check-in Baggage</div>
+                                    <div>✓ 15kg Cabin Baggage</div>
+                                    <div>✓ Lounge Access</div>
+                                    <div>✓ Lie-flat Seats</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Step 2: Return Flight -->
+            <div class="flight-step">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">🛬 Select Return Flight</div>
+                    <span id="return-selected" class="selection-indicator" style="display: none;">✓ Selected</span>
+                </div>
+
+                <div class="flight-options-list">
+                    {% for flight in flights.return %}
+                    <div class="flight-option-card" data-flight-index="{{ forloop.counter0 }}" data-direction="return">
+                        <div class="flight-main-info">
+                            <div class="airline-section">
+                                <div class="airline-icon">{{ flight.airline|slice:":2"|upper }}</div>
+                                <div>
+                                    <div class="airline-name">{{ flight.airline }}</div>
+                                    <div class="flight-number">{{ flight.flight_no }}</div>
+                                </div>
+                            </div>
+                            <div class="direct-badge">{{ flight.stops }}</div>
+                        </div>
+
+                        <div class="flight-timing">
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.departure }}</div>
+                                <div class="location-text">{{ flight.from }}</div>
+                            </div>
+                            <div class="timing-divider">
+                                <div class="plane-icon">✈</div>
+                                <div class="duration-text">{{ flight.duration }}</div>
+                            </div>
+                            <div class="timing-point">
+                                <div class="time-large">{{ flight.arrival }}</div>
+                                <div class="location-text">{{ flight.to }}</div>
+                            </div>
+                        </div>
+
+                        <div class="seat-classes">
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="economy-{{ forloop.counter0 }}" data-price="{{ flight.economy }}" data-class="Economy">
+                                <div class="class-label">💺 Economy</div>
+                                <div class="class-price-large">₹{{ flight.economy|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 15kg Check-in Baggage</div>
+                                    <div>✓ 7kg Cabin Baggage</div>
+                                    <div>✓ Complimentary Meals</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="premium-{{ forloop.counter0 }}" data-price="{{ flight.premium }}" data-class="Premium Economy">
+                                <div class="class-label">⭐ Premium</div>
+                                <div class="class-price-large">₹{{ flight.premium|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 25kg Check-in Baggage</div>
+                                    <div>✓ 10kg Cabin Baggage</div>
+                                    <div>✓ Priority Boarding</div>
+                                    <div>✓ Extra Legroom</div>
+                                </div>
+                            </label>
+                            <label class="class-option">
+                                <input type="radio" name="return-class" value="business-{{ forloop.counter0 }}" data-price="{{ flight.business }}" data-class="Business Class">
+                                <div class="class-label">👔 Business</div>
+                                <div class="class-price-large">₹{{ flight.business|floatformat:0 }}</div>
+                                <div class="class-benefits">
+                                    <div>✓ 40kg Check-in Baggage</div>
+                                    <div>✓ 15kg Cabin Baggage</div>
+                                    <div>✓ Lounge Access</div>
+                                    <div>✓ Lie-flat Seats</div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="price-summary">
+                <div class="price-breakdown" id="price-breakdown">Select flights to see total price</div>
+                <div class="total-amount" id="total-price">₹0</div>
+            </div>
+            <button class="confirm-booking-btn" id="confirm-btn" disabled onclick="confirmBooking()">
+                CONFIRM BOOKING
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ADD THIS JAVASCRIPT AT THE END, BEFORE {% endblock %} -->
+<script>
+let selectedFlights = {
+    outbound: { flight: null, class: null, price: 0 },
+    return: { flight: null, class: null, price: 0 }
+};
+
+function openFlightModal() {
+    document.getElementById('flightModal').classList.add('show');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeFlightModal() {
+    document.getElementById('flightModal').classList.remove('show');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.getElementById('flightModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeFlightModal();
+    }
+});
+
+// Handle flight card selection
+document.querySelectorAll('.flight-option-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+        
+        const direction = this.dataset.direction;
+        const flightIndex = this.dataset.flightIndex;
+        
+        // Remove selection from other cards in same direction
+        document.querySelectorAll(`.flight-option-card[data-direction="${direction}"]`).forEach(c => {
+            c.classList.remove('selected');
+        });
+        
+        // Add selection to this card
+        this.classList.add('selected');
+        
+        // Store flight selection
+        selectedFlights[direction].flight = flightIndex;
+        
+        // Show selection indicator
+        document.getElementById(`${direction}-selected`).style.display = 'inline-block';
+        
+        updateTotal();
+    });
+});
+
+// Handle seat class selection
+document.querySelectorAll('.class-option').forEach(option => {
+    option.addEventListener('click', function() {
+        const radio = this.querySelector('input[type="radio"]');
+        radio.checked = true;
+        
+        // Remove selected from siblings
+        this.parentElement.querySelectorAll('.class-option').forEach(opt => {
+            opt.classList.remove('selected');
+        });
+        
+        // Add selected to this option
+        this.classList.add('selected');
+        
+        // Get direction from radio name
+        const direction = radio.name.includes('outbound') ? 'outbound' : 'return';
+        
+        // Store class and price
+        selectedFlights[direction].class = radio.dataset.class;
+        selectedFlights[direction].price = parseInt(radio.dataset.price);
+        
+        updateTotal();
+    });
+});
+
+function updateTotal() {
+    const outboundPrice = selectedFlights.outbound.price || 0;
+    const returnPrice = selectedFlights.return.price || 0;
+    const total = outboundPrice + returnPrice;
+    
+    // Update total display
+    document.getElementById('total-price').textContent = '₹' + total.toLocaleString('en-IN');
+    
+    // Update breakdown
+    let breakdown = '';
+    if (selectedFlights.outbound.class && selectedFlights.return.class) {
+        breakdown = `Outbound (${selectedFlights.outbound.class}): ₹${outboundPrice.toLocaleString('en-IN')} + Return (${selectedFlights.return.class}): ₹${returnPrice.toLocaleString('en-IN')}`;
+        document.getElementById('confirm-btn').disabled = false;
+    } else if (selectedFlights.outbound.class) {
+        breakdown = `Outbound flight selected - Please select return flight`;
+        document.getElementById('confirm-btn').disabled = true;
+    } else if (selectedFlights.return.class) {
+        breakdown = `Return flight selected - Please select outbound flight`;
+        document.getElementById('confirm-btn').disabled = true;
+    } else {
+        breakdown = 'Select flights to see total price';
+        document.getElementById('confirm-btn').disabled = true;
+    }
+    
+    document.getElementById('price-breakdown').textContent = breakdown;
+}
+
+function confirmBooking() {
+    alert('Booking confirmed! Total: ₹' + (selectedFlights.outbound.price + selectedFlights.return.price).toLocaleString('en-IN') + '\n\nOutbound: ' + selectedFlights.outbound.class + '\nReturn: ' + selectedFlights.return.class);
+    closeFlightModal();
+}
+</script>

@@ -1,0 +1,228 @@
+{% extends 'store/base.html' %}
+{% load humanize %}
+
+{% block title %}Budget Planner - TravelVibe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+    .page-header h1 { font-size: 2.2rem; font-weight: 900; margin-bottom: 0.4rem; }
+    .page-header p { font-size: 1rem; opacity: 0.9; }
+
+    .planner-wrapper {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1.5rem 3rem;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: white;
+        border-radius: 14px;
+        padding: 1.8rem;
+        box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        border-top: 4px solid #0ea5e9;
+    }
+    .form-card h2 { font-size: 1.2rem; color: #1e293b; font-weight: 800; margin-bottom: 1.2rem; }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+    .form-group label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #0ea5e9;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 0.4rem;
+    }
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 0.7rem 0.9rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-family: 'Poppins', sans-serif;
+        background: #f8fafc;
+        transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+        outline: none; border-color: #0ea5e9; background: white;
+    }
+    .plan-btn {
+        padding: 0.75rem 2rem;
+        background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+        color: white; border: none; border-radius: 10px;
+        font-size: 0.95rem; font-weight: 800; cursor: pointer;
+        box-shadow: 0 4px 15px rgba(14,165,233,0.4);
+        text-transform: uppercase; letter-spacing: 1px;
+        transition: all 0.3s;
+    }
+    .plan-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(14,165,233,0.5); }
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>💰 Budget Planner</h1>
+    <p>Enter your budget and we'll find the best destinations for you</p>
+</section>
+
+<div class="planner-wrapper">
+    <!-- Input Form -->
+    <div class="form-card">
+        <h2>🔍 Plan Your Trip</h2>
+        <form method="GET" class="form-grid">
+            <div class="form-group">
+                <label>Total Budget (₹)</label>
+                <input type="number" name="budget" placeholder="e.g. 50000" value="{{ budget }}" min="1000">
+            </div>
+            <div class="form-group">
+                <label>No. of Travelers</label>
+                <input type="number" name="travelers" placeholder="e.g. 2" value="{{ travelers }}" min="1" max="20">
+            </div>
+            <div class="form-group">
+                <label>Destination Type</label>
+                <select name="destination_type">
+                    <option value="">All</option>
+                    <option value="domestic" {% if destination_type == 'domestic' %}selected{% endif %}>Domestic (India)</option>
+                    <option value="international" {% if destination_type == 'international' %}selected{% endif %}>International</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Duration (Days)</label>
+                <select name="duration">
+                    <option value="">Select</option>
+                    <option value="3" {% if duration == '3' %}selected{% endif %}>3 Days</option>
+                    <option value="5" {% if duration == '5' %}selected{% endif %}>5 Days</option>
+                    <option value="7" {% if duration == '7' %}selected{% endif %}>7 Days</option>
+                    <option value="10" {% if duration == '10' %}selected{% endif %}>10 Days</option>
+                    <option value="14" {% if duration == '14' %}selected{% endif %}>14 Days</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>&nbsp;</label>
+                <button type="submit" class="plan-btn">✈️ Plan Now</button>
+            </div>
+        </form>
+    </div>
+
+    {% if suggestions %}
+    <!-- Summary Bar -->
+    <div style="background: linear-gradient(135deg, #0ea5e9, #06b6d4); color: white; border-radius: 12px; padding: 1.2rem 1.8rem; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 2rem; align-items: center;">
+        <div><div style="font-size:0.75rem;opacity:0.85;text-transform:uppercase;letter-spacing:1px;">Total Budget</div><div style="font-size:1.5rem;font-weight:900;">₹{{ suggestions.total_budget|intcomma }}</div></div>
+        <div><div style="font-size:0.75rem;opacity:0.85;text-transform:uppercase;letter-spacing:1px;">Per Person</div><div style="font-size:1.5rem;font-weight:900;">₹{{ suggestions.budget_per_person|intcomma }}</div></div>
+        <div><div style="font-size:0.75rem;opacity:0.85;text-transform:uppercase;letter-spacing:1px;">Travelers</div><div style="font-size:1.5rem;font-weight:900;">{{ suggestions.num_travelers }}</div></div>
+        <div><div style="font-size:0.75rem;opacity:0.85;text-transform:uppercase;letter-spacing:1px;">Duration</div><div style="font-size:1.5rem;font-weight:900;">{{ suggestions.num_days }} Days</div></div>
+        <div><div style="font-size:0.75rem;opacity:0.85;text-transform:uppercase;letter-spacing:1px;">Hotel Tier</div><div style="font-size:1.5rem;font-weight:900;">{{ suggestions.hotel_tier|title }}</div></div>
+    </div>
+
+    <!-- Destination Results -->
+    {% if suggestions.viable_destinations %}
+    <h2 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin-bottom:1rem;">🌍 Destinations Within Your Budget</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;margin-bottom:2rem;">
+        {% for dest in suggestions.viable_destinations %}
+        <div style="background:white;border-radius:14px;padding:1.3rem;box-shadow:0 4px 18px rgba(0,0,0,0.08);border-left:4px solid {% if dest.fit == 'great' %}#10b981{% else %}#f59e0b{% endif %};">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+                <div>
+                    <span style="font-size:1.8rem;">{{ dest.emoji }}</span>
+                    <span style="font-size:1.1rem;font-weight:800;color:#1e293b;margin-left:0.5rem;">{{ dest.name }}</span>
+                </div>
+                <span style="background:{% if dest.fit == 'great' %}#d1fae5;color:#065f46{% else %}#fef3c7;color:#92400e{% endif %};padding:0.3rem 0.7rem;border-radius:20px;font-size:0.72rem;font-weight:700;">
+                    {% if dest.fit == 'great' %}✓ Great Fit{% else %}⚡ Tight{% endif %}
+                </span>
+            </div>
+            <p style="color:#64748b;font-size:0.8rem;margin-bottom:0.8rem;">📍 {{ dest.country }} &nbsp;|&nbsp; 🎯 {{ dest.best_for }}</p>
+
+            <!-- Cost Breakdown -->
+            <div style="background:#f8fafc;border-radius:10px;padding:0.9rem;margin-bottom:0.8rem;font-size:0.82rem;">
+                <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #e2e8f0;"><span style="color:#64748b;">✈️ Flights (per person)</span><span style="font-weight:700;">₹{{ dest.flight_cost|intcomma }}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #e2e8f0;"><span style="color:#64748b;">🏨 Hotel ({{ suggestions.num_days }} nights)</span><span style="font-weight:700;">₹{{ dest.stay_cost|intcomma }}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:0.3rem 0;border-bottom:1px solid #e2e8f0;"><span style="color:#64748b;">🍽️ Food & Transport</span><span style="font-weight:700;">₹{{ dest.food_transport|intcomma }}</span></div>
+                <div style="display:flex;justify-content:space-between;padding:0.4rem 0;"><span style="color:#1e293b;font-weight:700;">Total for {{ suggestions.num_travelers }} traveler(s)</span><span style="font-weight:900;color:#0ea5e9;">₹{{ dest.total_for_group|intcomma }}</span></div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-size:0.8rem;color:#10b981;font-weight:700;">💰 Remaining: ₹{{ dest.remaining_budget|intcomma }}</span>
+                <a href="{% url 'packages' %}?destination={{ dest.name }}" style="background:linear-gradient(135deg,#0ea5e9,#06b6d4);color:white;padding:0.45rem 1rem;border-radius:8px;font-size:0.78rem;font-weight:700;text-decoration:none;">View Packages →</a>
+            </div>
+
+            <!-- Highlights -->
+            <div style="margin-top:0.8rem;display:flex;flex-wrap:wrap;gap:0.4rem;">
+                {% for h in dest.highlights %}
+                <span style="background:#e0f2fe;color:#0369a1;padding:0.25rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:600;">{{ h }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Hotel Recommendations -->
+    <h2 style="font-size:1.3rem;font-weight:800;color:#1e293b;margin-bottom:1rem;">🏨 Recommended Hotels ({{ suggestions.hotel_tier|title }} Tier)</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+        {% for hotel in suggestions.hotels %}
+        <div style="background:white;border-radius:14px;padding:1.2rem;box-shadow:0 4px 18px rgba(0,0,0,0.08);border-top:3px solid #0ea5e9;">
+            <div style="font-size:1rem;font-weight:800;color:#1e293b;margin-bottom:0.3rem;">🏨 {{ hotel.name }}</div>
+            <div style="font-size:0.8rem;color:#0ea5e9;font-weight:600;margin-bottom:0.6rem;">{{ hotel.type }} &nbsp;⭐ {{ hotel.rating }}</div>
+            <div style="font-size:0.82rem;color:#64748b;margin-bottom:0.8rem;">{{ hotel.amenities }}</div>
+            <div style="font-size:1.1rem;font-weight:900;color:#10b981;">₹{{ hotel.price_per_night|intcomma }} <span style="font-size:0.75rem;font-weight:600;color:#64748b;">/ night</span></div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div style="background:white;border-radius:14px;padding:3rem;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+        <svg width="90" height="90" viewBox="0 0 90 90" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:1rem;">
+            <!-- Empty wallet -->
+            <rect x="10" y="28" width="70" height="44" rx="8" fill="#e0f2fe" stroke="#0ea5e9" stroke-width="2.5"/>
+            <rect x="10" y="36" width="70" height="10" fill="#bae6fd"/>
+            <circle cx="62" cy="52" r="7" fill="#0ea5e9" opacity="0.3" stroke="#0ea5e9" stroke-width="2"/>
+            <line x1="59" y1="49" x2="65" y2="55" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="65" y1="49" x2="59" y2="55" stroke="#0ea5e9" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- coin falling out -->
+            <circle cx="30" cy="22" r="8" fill="#fde68a" stroke="#f59e0b" stroke-width="2"/>
+            <text x="26" y="27" font-size="9" fill="#92400e" font-family="sans-serif" font-weight="bold">₹</text>
+            <line x1="30" y1="30" x2="30" y2="36" stroke="#f59e0b" stroke-width="2" stroke-dasharray="2 2"/>
+        </svg>
+        <h3 style="color:#1e293b;font-size:1.2rem;font-weight:800;margin-bottom:0.5rem;">No destinations found within your budget</h3>
+        <p style="color:#64748b;">Try increasing your budget or reducing the number of days.</p>
+    </div>
+    {% endif %}
+
+    {% elif budget %}
+    <div style="background:white;border-radius:14px;padding:2rem;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+        <p style="color:#ef4444;font-weight:600;">Please enter a valid budget and number of travelers.</p>
+    </div>
+    {% else %}
+    <div style="background:white;border-radius:14px;padding:3rem;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:1rem;">
+            <!-- Plane body -->
+            <path d="M15 50 L55 20 L75 30 L55 42 Z" fill="#bae6fd" stroke="#0ea5e9" stroke-width="2" stroke-linejoin="round"/>
+            <!-- Wing -->
+            <path d="M35 44 L20 65 L50 52 Z" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Tail -->
+            <path d="M55 42 L65 55 L75 30 Z" fill="#7dd3fc" stroke="#0ea5e9" stroke-width="1.5" stroke-linejoin="round"/>
+            <!-- Window -->
+            <circle cx="48" cy="33" r="4" fill="white" stroke="#0ea5e9" stroke-width="1.5"/>
+            <!-- Dashed trail -->
+            <path d="M75 30 Q85 25 90 18" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="3 3" stroke-linecap="round" fill="none"/>
+            <!-- Map pin destination -->
+            <circle cx="88" cy="14" r="5" fill="#0ea5e9"/>
+            <path d="M88 19 L88 24" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h3 style="color:#1e293b;font-size:1.2rem;font-weight:800;margin-bottom:0.5rem;">Enter your budget above to get started</h3>
+        <p style="color:#64748b;">We'll suggest the best destinations and hotels that fit your budget.</p>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
