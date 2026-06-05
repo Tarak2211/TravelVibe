@@ -9,9 +9,9 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     '.vercel.app',
+    '.now.sh',
     'localhost',
     '127.0.0.1',
-    '.now.sh',
 ]
 
 INSTALLED_APPS = [
@@ -29,7 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',   # <-- serve static files on Vercel
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -60,14 +60,15 @@ WSGI_APPLICATION = 'travelvibe.wsgi.application'
 
 # ---------------------------------------------------------------------------
 # DATABASE
-# On Vercel the filesystem is read-only except /tmp.
-# We write the SQLite file there so Django can open it.
-# For production you should migrate to PostgreSQL (e.g. Neon, Supabase).
+# Vercel deploys to /var/task and has a read-only filesystem except /tmp.
+# Detect Vercel by checking the actual runtime path — no env var needed.
 # ---------------------------------------------------------------------------
+IS_VERCEL = str(BASE_DIR).startswith('/var/task')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3' if os.environ.get('VERCEL') else BASE_DIR / 'db.sqlite3',
+        'NAME': '/tmp/db.sqlite3' if IS_VERCEL else str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -79,7 +80,7 @@ USE_I18N = True
 USE_TZ = True
 
 # ---------------------------------------------------------------------------
-# STATIC FILES  — WhiteNoise handles serving on Vercel
+# STATIC FILES — WhiteNoise serves them on Vercel (no separate static server)
 # ---------------------------------------------------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -92,14 +93,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-# Email Configuration
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = f"TravelVibe <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else 'TravelVibe <noreply@travelvibe.com>'
+DEFAULT_FROM_EMAIL = (
+    f"TravelVibe <{EMAIL_HOST_USER}>"
+    if EMAIL_HOST_USER
+    else 'TravelVibe <noreply@travelvibe.com>'
+)
 
 SESSION_COOKIE_AGE = 86400
 LOGIN_URL = '/accounts/login/'
