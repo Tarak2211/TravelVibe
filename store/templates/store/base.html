@@ -94,6 +94,121 @@
             width: 100%;
         }
 
+        /* ── Hamburger Button ── */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 28px;
+            height: 20px;
+            cursor: pointer;
+            padding: 0;
+            background: none;
+            border: none;
+            z-index: 1100;
+        }
+
+        .hamburger span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+            border-radius: 3px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: center;
+        }
+
+        /* Animate to X when open */
+        .hamburger.open span:nth-child(1) {
+            transform: translateY(8.5px) rotate(45deg);
+        }
+
+        .hamburger.open span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger.open span:nth-child(3) {
+            transform: translateY(-8.5px) rotate(-45deg);
+        }
+
+        /* ── Mobile overlay backdrop ── */
+        .nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+        }
+
+        /* ── Responsive Breakpoint ── */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 75%;
+                max-width: 300px;
+                background: rgba(255, 255, 255, 0.98);
+                backdrop-filter: blur(16px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: flex-start;
+                gap: 0;
+                padding: 5rem 2rem 2rem;
+                z-index: 1050;
+                transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+            }
+
+            .nav-links.open {
+                right: 0;
+            }
+
+            .nav-links li {
+                width: 100%;
+                border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+            }
+
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-links a {
+                display: block;
+                padding: 1rem 0.5rem;
+                font-size: 1.05rem;
+                font-weight: 500;
+                color: #2d3748;
+                width: 100%;
+            }
+
+            .nav-links a::after {
+                display: none;
+            }
+
+            .nav-links a:hover {
+                color: #0ea5e9;
+                padding-left: 1rem;
+                transition: all 0.2s ease;
+            }
+
+            .nav-overlay {
+                display: block;
+            }
+        }
+
         main {
             min-height: calc(100vh - 200px);
         }
@@ -213,7 +328,15 @@
     <header>
         <nav>
             <a href="{% if user.is_staff %}{% url 'accounts_report' %}{% else %}{% url 'homepage' %}{% endif %}" class="logo">TravelVibe</a>
-            <ul class="nav-links">
+
+            <!-- Hamburger button (mobile only) -->
+            <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <ul class="nav-links" id="nav-links">
                 {% if user.is_staff %}
                 <li><a href="{% url 'accounts_report' %}">Accounts</a></li>
                 <li><a href="{% url 'about' %}">About</a></li>
@@ -236,6 +359,9 @@
                 {% endif %}
             </ul>
         </nav>
+
+        <!-- Dark overlay behind mobile menu -->
+        <div class="nav-overlay" id="nav-overlay"></div>
     </header>
 
     <main>
@@ -291,6 +417,50 @@
             <p>&copy; 2026 TravelVibe. All rights reserved. | Designed with ❤️ for travelers</p>
         </div>
     </footer>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const navLinks  = document.getElementById('nav-links');
+        const overlay   = document.getElementById('nav-overlay');
+
+        function openMenu() {
+            hamburger.classList.add('open');
+            navLinks.classList.add('open');
+            overlay.classList.add('active');
+            hamburger.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden'; // prevent scroll behind menu
+        }
+
+        function closeMenu() {
+            hamburger.classList.remove('open');
+            navLinks.classList.remove('open');
+            overlay.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.contains('open') ? closeMenu() : openMenu();
+        });
+
+        // Close when clicking the dark overlay
+        overlay.addEventListener('click', closeMenu);
+
+        // Close when a nav link is clicked (navigate away)
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Close on Escape key
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeMenu();
+        });
+
+        // Close menu if window resized above mobile breakpoint
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) closeMenu();
+        });
+    </script>
 </body>
 
 </html>
