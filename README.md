@@ -30,7 +30,6 @@ TravelVibe/
 ```
 
 ---
----
 
 ## 📸 Screenshots
 
