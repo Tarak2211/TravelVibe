@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 from decouple import config
 
@@ -60,17 +61,27 @@ WSGI_APPLICATION = 'travelvibe.wsgi.application'
 
 # ---------------------------------------------------------------------------
 # DATABASE
-# Vercel deploys to /var/task and has a read-only filesystem except /tmp.
-# Detect Vercel by checking the actual runtime path — no env var needed.
+# If DATABASE_URL is set (Neon on Vercel), use PostgreSQL.
+# Falls back to local SQLite for development.
 # ---------------------------------------------------------------------------
-IS_VERCEL = str(BASE_DIR).startswith('/var/task')
+DATABASE_URL = config('DATABASE_URL', default='')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/tmp/db.sqlite3' if IS_VERCEL else str(BASE_DIR / 'db.sqlite3'),
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Local development — SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = []
 
