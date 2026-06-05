@@ -30,7 +30,6 @@ TravelVibe/
 ```
 
 ---
-
 ## 📸 Screenshots
 
 ### Home Page
@@ -49,7 +48,7 @@ TravelVibe/
 
 ![About Page](./static/AboutPage.png)
 
-### BudgetPlanner Page
+ ### BudgetPlanner Page
 
 ![BudgetPlanner Page](./static/BudgetPlanner.png)
 
@@ -66,7 +65,6 @@ TravelVibe/
 ![Admin Dashboard](./static/AdminDashboard.png)
 
 ---
-
 
 ## Features Implemented
 
@@ -296,19 +294,5 @@ Then visit: http://127.0.0.1:8000/
 
 All models, views, and templates for Steps 1-2 are working. The database schema for Steps 3-9 is complete and ready for implementation.
 
-## Documentation
 
-- `SETUP_GUIDE.md` - Complete setup instructions
-- `PROJECT_STATUS.md` - Detailed project status
-- `IMPLEMENTATION_PLAN.md` - Feature implementation plan
-#   T r a v e l V i b e 
- 
- #   T r a v e l - V i b e 
- 
- #   T r a v e l V i b e 
- 
- #   T r a v e l V i b e 
- 
- #   T r a v e l V i b e 
- 
- 
+    
