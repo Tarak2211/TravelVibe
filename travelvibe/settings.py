@@ -1,11 +1,19 @@
+import os
 from pathlib import Path
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
+DEBUG = config('DEBUG', default=False, cast=bool)
+
+ALLOWED_HOSTS = [
+    '.vercel.app',
+    'localhost',
+    '127.0.0.1',
+    '.now.sh',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,6 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',   # <-- serve static files on Vercel
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -49,11 +58,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'travelvibe.wsgi.application'
 
-
+# ---------------------------------------------------------------------------
+# DATABASE
+# On Vercel the filesystem is read-only except /tmp.
+# We write the SQLite file there so Django can open it.
+# For production you should migrate to PostgreSQL (e.g. Neon, Supabase).
+# ---------------------------------------------------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/tmp/db.sqlite3' if os.environ.get('VERCEL') else BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -64,9 +78,15 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+# ---------------------------------------------------------------------------
+# STATIC FILES  — WhiteNoise handles serving on Vercel
+# ---------------------------------------------------------------------------
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-MEDIA_URL = 'media/'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -84,14 +104,12 @@ DEFAULT_FROM_EMAIL = f"TravelVibe <{EMAIL_HOST_USER}>" if EMAIL_HOST_USER else '
 SESSION_COOKIE_AGE = 86400
 LOGIN_URL = '/accounts/login/'
 
-# Amadeus Flight API Configuration
-# Get FREE credentials from https://developers.amadeus.com/register
+# Amadeus Flight API
 AMADEUS_API_KEY = config('AMADEUS_API_KEY', default='')
 AMADEUS_API_SECRET = config('AMADEUS_API_SECRET', default='')
 
-# Twilio — SMS & WhatsApp notifications
-# Get credentials from https://www.twilio.com (free trial available)
+# Twilio
 TWILIO_ACCOUNT_SID = config('TWILIO_ACCOUNT_SID', default='')
 TWILIO_AUTH_TOKEN = config('TWILIO_AUTH_TOKEN', default='')
-TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER', default='')       # e.g. +1234567890
-TWILIO_WHATSAPP_NUMBER = config('TWILIO_WHATSAPP_NUMBER', default='whatsapp:+14155238886')  # Twilio sandbox
+TWILIO_PHONE_NUMBER = config('TWILIO_PHONE_NUMBER', default='')
+TWILIO_WHATSAPP_NUMBER = config('TWILIO_WHATSAPP_NUMBER', default='whatsapp:+14155238886')
