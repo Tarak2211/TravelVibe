@@ -30,12 +30,7 @@ def register_view(request):
             # Unique username — auto-suffix if taken
             user.username = _make_unique_username(form.cleaned_data.get('username', ''))
 
-            # Unique email — show friendly error if taken
-            email = form.cleaned_data.get('email', '').strip().lower()
-            if CustomUser.objects.filter(email=email).exists():
-                messages.error(request, 'This email is already registered. Please login instead.')
-                return render(request, 'accounts/register.html', {'form': form})
-            user.email = email
+            user.email = form.cleaned_data.get('email', '').strip().lower()
 
             # Unique phone — store None if already taken (don't crash)
             phone = form.cleaned_data.get('phone_number', '').strip()
