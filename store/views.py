@@ -2011,8 +2011,11 @@ def create_booking_view(request, package_id=None):
             )
 
         try:
+            import threading
             from bookings.notifications import send_all_booking_notifications
-            send_all_booking_notifications(booking)
+            t = threading.Thread(target=send_all_booking_notifications, args=(booking,), daemon=True)
+            t.start()
+            t.join(timeout=8)  # Wait up to 8s so Vercel doesn't kill it before email sends
         except Exception as notif_err:
             logger.warning(f"Notification failed for {booking.booking_id}: {notif_err}")
 
